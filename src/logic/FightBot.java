@@ -14,11 +14,14 @@ public class FightBot {
     Region specialButton;
     Region pauseRegion;
 
-    public FightBot(Region r, Region attackRegion, Region tinyUpTop){
+    double similarity = 0.95;
+
+    public FightBot(Region r, Region attackRegion, Region tinyUpTop, double defaultSimilarity){
         this.r = r;
         this.attackRegion = attackRegion;
         this.setEnergyLocation();
         this.pauseRegion = tinyUpTop;
+        this.similarity = defaultSimilarity;
     }
 
     private void setEnergyLocation(){
@@ -52,7 +55,7 @@ public class FightBot {
                 else {
                     counter++;
                     if(counter >= punchesRepeat)
-                        if(Utils.findWithSimilarity(this.specialBar, "specialRed", 0.75) != null)
+                        if(Utils.findWithSimilarity(this.specialBar, "specialRed", 0.75, this.similarity) != null)
                             specialActive = true;
                 }
             }else

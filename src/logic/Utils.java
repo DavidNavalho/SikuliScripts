@@ -50,15 +50,15 @@ public class Utils {
     }
 
     //TODO: better method of putting back default similarity
-    public static Match findWithSimilarity(Region r, String imagePath, double similarity){
+    public static Match findWithSimilarity(Region r, String imagePath, double similarity, double previousSimilarity){
         Settings.MinSimilarity = similarity;
         try{
             Match m = r.find(imagePath);
-            Settings.MinSimilarity = 0.95;
+            Settings.MinSimilarity = previousSimilarity;
             return m;
         }catch(FindFailed e){
             System.out.println("Searched for "+imagePath+", did not find it.");
-            Settings.MinSimilarity = 0.95;
+            Settings.MinSimilarity = previousSimilarity;
             return null;
         }
     }

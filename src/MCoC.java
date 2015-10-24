@@ -15,11 +15,13 @@ public class MCoC {
     private int defaultReconnectWait = 15; //minutes
     private int first = 1;
     private int second = 1;
+    private double similarity = 0.90;
 
     private Region topMiddle, tinyUpTop, lowerRight, tinyLowerRight, lowerLeft, regenRegion, thirdBoxRegion, middleColumn, middleLowerColumn;
 
     public MCoC(String location, int first, int second, double similarity) {
-        Settings.MinSimilarity = similarity;
+        this.similarity = similarity;
+        Settings.MinSimilarity = this.similarity;
         this.first = 1;
         this.second = 2;
         this.r = this.setScreen(location);
@@ -51,7 +53,7 @@ public class MCoC {
         int x = centerX + (this.r.getW()/4);
         int centerY = this.r.getCenter().y;
         this.fightRegion = new Region(x, centerY,50,50);
-        this.bot = new FightBot(this.r, fightRegion, this.tinyUpTop);
+        this.bot = new FightBot(this.r, fightRegion, this.tinyUpTop, this.similarity);
     }
 
     private Region getArenaRegion(String arena){
