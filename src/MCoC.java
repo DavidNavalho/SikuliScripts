@@ -5,21 +5,45 @@ import org.sikuli.script.*;
 
 import java.io.File;
 
-/**
- * Created by davidnavalho on 25/09/15.
- */
 public class MCoC {
     public Region r;
+    private int X1,X2,Y1,Y2;
     private int wait = 15;
     private int defaultWaitTime = 3;
     private FightBot bot = null;
     private Region fightRegion = null;
+    private int defaultReconnectWait = 15; //minutes
+    private int first = 1;
+    private int second = 1;
 
-    public MCoC(String location) {
-        Settings.MinSimilarity = 0.95;
+    private Region topMiddle, tinyUpTop, lowerRight, tinyLowerRight, lowerLeft, regenRegion, thirdBoxRegion, middleColumn, middleLowerColumn;
+
+    public MCoC(String location, int first, int second, double similarity) {
+        Settings.MinSimilarity = similarity;
+        this.first = 1;
+        this.second = 2;
         this.r = this.setScreen(location);
         Utils.setImagesPath("");
+        this.setupRegions();
         this.setupFightBot();
+    }
+
+    private void setupRegions(){
+        int height = this.r.getH();
+        int width = this.r.getW();
+        int quarterHeight = height/4;
+        int quarterWidth = width/4;
+        int eightWidth = width/8;
+        //topMiddle: x,y => X1+quarterWidth, Y1; size: experiment
+        this.topMiddle = new Region(X1+quarterWidth, Y1, width/2, height/2);
+        this.tinyUpTop = new Region(X1+quarterWidth+eightWidth+width/16, Y1, eightWidth, height/8);
+        this.lowerRight = new Region(X2-width/2, Y2-quarterHeight, width/2, quarterHeight);
+        this.tinyLowerRight = new Region(X2-width/6, Y2-height/9, width/6, height/9);
+        this.regenRegion = new Region(X1+quarterWidth, Y1+quarterHeight, eightWidth, quarterHeight);
+        this.thirdBoxRegion = new Region(X1+width/16, Y1+2*height/5, 3*width/20, 3*height/20);
+        this.middleColumn = new Region(X1+quarterWidth, Y1, width/2, height);
+        this.middleLowerColumn = new Region(X1+quarterWidth, Y1+height/2, width/2, height/2);
+        this.lowerLeft = new Region(X1, Y2-quarterHeight, quarterWidth, quarterHeight);
     }
 
     private void setupFightBot(){
@@ -27,7 +51,7 @@ public class MCoC {
         int x = centerX + (this.r.getW()/4);
         int centerY = this.r.getCenter().y;
         this.fightRegion = new Region(x, centerY,50,50);
-        this.bot = new FightBot(this.r, fightRegion);
+        this.bot = new FightBot(this.r, fightRegion, this.tinyUpTop);
     }
 
     private Region getArenaRegion(String arena){
@@ -52,28 +76,12 @@ public class MCoC {
     }
 
 
-    public Region setScreen(String location){
+    private Region setScreen(String location){
         int sn = 0;
-        int X1 = 0;
-        int Y1 = 0;
-        int X2 = 0;
-        int Y2 = 0;
-
-        /*if(location.equalsIgnoreCase("macbook_homeExternalScreen")) {
-            sn = 1;
-            X1 = 840;  //805  (~35)
-            Y1 = 145;  //90   (~55)
-            X2 = 1265;  //1230   (~35)
-            Y2 = 780;   //725    (~55)
-            Y1 -= 1080;
-            Y2 -= 1080;
-        }else*/ if(location.equalsIgnoreCase("macbook_FCTUNLExternalScreenLarge")){
-            sn = 1;
-            X1 = 480;
-            Y1 = 45;
-            X2 = 1230;
-            Y2 = 460;
-        }else
+        X1 = 0;
+        Y1 = 0;
+        X2 = 0;
+        Y2 = 0;
         if(location.equalsIgnoreCase("macbook_screen")){
             sn = 0;
             X1 = 480;
@@ -82,58 +90,121 @@ public class MCoC {
             Y2 = 460;
 //            Y1 -= 1080;
 //            Y2 -= 1080;
+        }else if(location.equalsIgnoreCase("iMac_screen")){
+            sn = 0;
+            X1 = 1120;
+            Y1 = 45;
+            X2 = 2510;
+            Y2 = 825;
         }
-
         Screen s = new Screen(sn);
         return s.setRect(X1, Y1, X2-X1, Y2-Y1);
     }
 
     private void ifExistsClick(String imageExists, String imageToClick){
-        try {
-            if(Utils.findExact(this.r, imageExists)!=null)
-                Utils.clickExact(this.r, imageToClick);
-        }catch(FindFailed ff){
-            System.out.println(imageExists+" or "+imageToClick+" not available, skipping.");
-        }
+        if(Utils.find(this.r, imageExists)!=null)
+            Utils.clickIfAvailable(this.r, imageToClick);
     }
 
-    private void clickIfAvailable(String image){
-        try {
-            Utils.clickExact(this.r, image);
-        }catch(FindFailed ff){
-            System.out.println(image+" not available, skipping.");
-        }
-    }
+//    private void clickIfAvailable(String image){
+//        try {
+//            Utils.clickExact(this.r, image);
+//        }catch(FindFailed ff){
+//            System.out.println(image+" not available, skipping.");
+//        }
+//    }
 
-    private void clickWhileAvailable(String image){
-        while(Utils.findExact(this.r, image)!=null) {
-            this.r.getLastMatch().click();
-            Utils.sleep(this.defaultWaitTime/2);
-        }
-    }
 
-    private void attemptFight(){
+    private void attemptFight(String previousImagesPath){
         try {
             this.bot.fight();
         }catch(FindFailed e){
             System.out.println("Fight failed somehow");
         }
-        //Set back the path TODO: have the previous path as a variable?
-        Utils.setImagesPath("/control");
+        Utils.setImagesPath(previousImagesPath);
     }
 
     private int secondArenaDoneCounter = 0;
+    private int firstArenaDoneCounter = 0;
+    //Pre: first+second must always be>0
     private void chooseArena(String fix){
         if(fix.equalsIgnoreCase("second"))
             Utils.click(this.getArenaRegion("second"));
         else if(fix.equalsIgnoreCase("first"))
             Utils.click(this.getArenaRegion("first"));
-        else if(secondArenaDoneCounter<4){
-            secondArenaDoneCounter++;
+        else if(this.secondArenaDoneCounter>0){
+            this.secondArenaDoneCounter--;
             Utils.click(this.getArenaRegion("second"));
-        }else{
-            secondArenaDoneCounter = 0;
+        }else if(this.firstArenaDoneCounter>0){
+            this.firstArenaDoneCounter--;
             Utils.click(this.getArenaRegion("first"));
+        }else{//If it reaches this, then it's iterated
+            this.firstArenaDoneCounter = this.first;
+            this.secondArenaDoneCounter = this.second;
+            this.chooseArena(fix);
+        }
+    }
+
+    private void uncommonOperations(){
+        Utils.setImagesPath("/control");
+        //Reconnect menu TODO: make it sleep for at least some minutes before reconnecting
+        Match m = Utils.find(this.middleColumn, "reconnect");
+        if(m!=null) {
+            System.out.println("Reconnect found, sleeping " + this.defaultReconnectWait+" minutes.");
+            Utils.sleep(this.defaultReconnectWait*60);
+            Utils.clickIfAvailable(this.middleColumn, "reconnect");
+        }
+        this.attemptFight("/control");
+        //Main Screen
+        Utils.clickIfAvailable(this.r, "mainMenuFight");
+        //Play Versus
+        Utils.clickIfAvailable(this.r, "playVersus");
+        this.attemptFight("/control");
+        //handle clicking on champ by mistake
+        this.ifExistsClick("info", "cross");
+        //dismiss rate us
+        Utils.clickIfAvailable(this.middleLowerColumn, "later");
+    }
+
+    private void commonOperations(String fixedArena){
+        //Check for Arenas, enter one:
+        Match match = Utils.find(this.topMiddle, "multiverseArenas");
+        if (match != null)
+            this.chooseArena(fixedArena);
+        //fill up boxes
+        this.fillBoxes();
+        this.attemptFight("/control");
+        //click findMatch if available
+        Utils.clickIfAvailable(this.lowerLeft, "findMatch");
+        //seriesMatchScreen
+        this.ifExistsClick("findNewMatch", "continue");
+        Utils.clickIfAvailable(this.lowerRight, "accept");
+        Utils.clickIfAvailable(this.tinyLowerRight, "continue");
+        //fightStuff
+        this.attemptFight("/control");
+        //statsKO, victory
+        this.ifExistsClick("statsKO","continueHighlighted");
+        this.ifExistsClick("stats","continueHighlighted");
+
+    }
+
+    private void takeCareofRegens(){
+        while(Utils.find(this.regenRegion, "regenBox")!=null) {
+            Utils.clickIfAvailable(this.r, "cross");
+            Utils.click(this.regenRegion.getLastMatch());
+        }
+    }
+
+    private void fillBoxes(){
+        try {
+            while (Utils.find(this.thirdBoxRegion, "availableSpot") != null) {
+                takeCareofRegens();//needs to be part of the logic here;
+                //TODO: 'fallback' if the first one has that clock icon - means this roster is full, and we should go back and do another arena
+                Utils.clickIfAvailable(this.r, "cross");
+                this.r.dragDrop(this.regenRegion,this.thirdBoxRegion);
+            }
+        }catch(FindFailed e){
+            System.out.println("Unexpected error at Edit Team Screen...");
         }
     }
 
@@ -141,62 +212,57 @@ public class MCoC {
     public void controller(String fixedArena){
         while(true) {
             Utils.setImagesPath("/control");
+            uncommonOperations();
+
+            this.attemptFight("/control");
+            commonOperations(fixedArena);
+            this.attemptFight("/control");
+            commonOperations(fixedArena);
+            this.attemptFight("/control");
+            commonOperations(fixedArena);
+            this.attemptFight("/control");
             //botFight
-            this.attemptFight();
-            //Reconnect menu TODO: make it sleep for at least some minutes before reconnecting
-            this.clickIfAvailable("reconnect");
+
             //Attempt at any continue (may need 2 (highlited) or more(all different))
-            this.clickIfAvailable("continue");
-            this.clickIfAvailable("accept");
-            //Main Screen
-            this.clickIfAvailable("mainMenuFight");
-            //Play Versus
-            this.clickIfAvailable("playVersus");
-            //botFight
-            this.attemptFight();
-            //Check for Arenas, enter one:
-            Match match = Utils.findExact(this.r, "multiverseArenas");
-            if (match != null)
-                this.chooseArena(fixedArena);
+//            this.clickIfAvailable("continue");
+//            this.clickIfAvailable("accept");
+
                 //Utils.click(match.offset(0, 310));
-            //Handle regen boxes
-            this.clickWhileAvailable("regenBox");
-            //handle clicking on champ by mistake
-            this.ifExistsClick("info", "cross");
+
             //Edit Team:
-            try {             //TODO: maybe not base it on edit team, but on empty box instead...??
-                Match boxMatch = Utils.findExact(this.r, "availableSpot");
-                if (boxMatch != null) {
-                    Match editTeam = Utils.findExact(this.r, "editTeam");
-                    Region champ = editTeam.offset(-200, 100);
-                    Region emptyBox = editTeam.offset(-380, 135);
-                    this.r.dragDrop(champ, emptyBox);
-                }
-            } catch (FindFailed e) {
-                System.out.println("Failed on Edit Team...");
-            }
-            try {
-                if ((Utils.findExact(this.r, "editTeam") != null) && (Utils.findExact(this.r, "availableSpot") == null))
-                    Utils.clickExact(this.r, "findMatch");
-            } catch (FindFailed e) {
-                System.out.println("Failed somehow on clicking findMatch");
-            }
+//            try {             //TODO: maybe not base it on edit team, but on empty box instead...??
+//                Match boxMatch = Utils.findExact(this.r, "availableSpot");
+//                if (boxMatch != null) {
+//                    Match editTeam = Utils.findExact(this.r, "editTeam");
+//                    Region champ = editTeam.offset(-200, 100);
+//                    Region emptyBox = editTeam.offset(-380, 135);
+//                    this.r.dragDrop(champ, emptyBox);
+//                }
+//            } catch (FindFailed e) {
+//                System.out.println("Failed on Edit Team...");
+//            }
+//            try {
+//                if ((Utils.findExact(this.r, "editTeam") != null) && (Utils.findExact(this.r, "availableSpot") == null))
+//                    Utils.clickExact(this.r, "findMatch");
+//            } catch (FindFailed e) {
+//                System.out.println("Failed somehow on clicking findMatch");
+//            }
             //fight won (lost too?)
-            Match fightFinished = Utils.findExact(this.r, "stats");
-            if(fightFinished!=null){
-                Region continueButton = fightFinished.offset(0,75);
-                Utils.click(continueButton);
-            }
-            //fight lost (won too?)
-            Match fightFinishedKO = Utils.findExact(this.r, "stats2");
-            if(fightFinishedKO!=null){
-                Region continueButton = fightFinishedKO.offset(0,75);
-                Utils.click(continueButton);
-            }
-//            'random' click from fight region
-            Utils.click(this.fightRegion);
-            //botFight
-            this.attemptFight();
+//            Match fightFinished = Utils.find(this.r, "stats");
+//            if(fightFinished!=null){
+//                Region continueButton = fightFinished.offset(0,75);
+//                Utils.click(continueButton);
+//            }
+//            //fight lost (won too?)
+//            Match fightFinishedKO = Utils.find(this.r, "stats2");
+//            if(fightFinishedKO!=null){
+//                Region continueButton = fightFinishedKO.offset(0,75);
+//                Utils.click(continueButton);
+//            }
+////            'random' click from fight region
+//            Utils.click(this.fightRegion);
+//            //botFight
+//            this.attemptFight("/control");
 //            Utils.sleep(5);
         }
     }
@@ -204,6 +270,13 @@ public class MCoC {
     public void tests(){
         try {
 //            Utils.setImagesPath("/fight");
+            Utils.setImagesPath("/control");
+            this.attemptFight("/control");
+//            Utils.highlightRegion(middleLowerColumn);
+//            Utils.searchAndHighlight(this.r, "continue");
+//            Match match = Utils.find(this.topMiddle, "multiverseArenas");
+//            Utils.highlightRegion(this.tinyLowerRight);
+//            Utils.highlightRegion(this.r);
 //            int centerX = this.r.getCenter().x;
 //            int centerY = this.r.getCenter().y;
 //            int xQuarter = this.r.getW()/4;
@@ -211,24 +284,22 @@ public class MCoC {
 //            int yQuarter = this.r.getH()/4;
 //            int yEight = this.r.getH()/8;
 //            int ySixteenth = this.r.getH()/16;
-//            //Third Special bar red (L3 active)
-//            Region specialBar = new Region(centerX-xSixteenth-xQuarter, centerY+yQuarter+yEight+ySixteenth,35,15);
-//            Region specialButton = new Region(centerX-xSixteenth*2-xQuarter, centerY+yQuarter+yEight+ySixteenth,35,15);
-//
-//
+////            //Third Special bar red (L3 active)
+////            Region specialBar = new Region(centerX-xSixteenth-xQuarter, centerY+yQuarter+yEight+ySixteenth,35,15);
+////            Region specialButton = new Region(centerX-xSixteenth*2-xQuarter, centerY+yQuarter+yEight+ySixteenth,35,15);
+//            Region sb = new Region(centerX-xSixteenth-xQuarter, centerY+yQuarter+yEight+this.r.getH()/30,xSixteenth,ySixteenth);
+//            Utils.highlightRegion(sb);
 //
 //            if(Utils.findExact(specialBar, "specialRed")!=null)
 //                Utils.click(specialButton);
-            Utils.setImagesPath("/fight");
-            Settings.MinSimilarity = 0.95;
-            Utils.find(this.r, "pause");
+//            Settings.MinSimilarity = 0.95;
+//            Utils.find(this.r, "pause");
 //            Utils.clickLastMatch(this.r);
-
 //        this.clickWhileAvailable("regenBox");
 //            Utils.findExact(this.r, "stats");
 //            Region continueButton = Utils.findExact(this.r, "stats").offset(0, 75);
 //            this.r.click(new Pattern("availableSpot").exact());
-            Utils.highlightRegion(this.r.getLastMatch());
+//            Utils.highlightRegion(this.r.getLastMatch());
 //            Utils.highlightRegion(continueButton);
 //            Utils.searchAndHighlight(this.r, "pause");
 //            this.ifExistsClick("info", "cross");
@@ -242,11 +313,14 @@ public class MCoC {
     }
 
     public static void main(String[] args) {
-        MCoC battler = new MCoC("macbook_screen");
+        //Args:
+        int firstCounter = 3;
+        int secondCounter = 1;
+        MCoC battler = new MCoC("iMac_screen", firstCounter, secondCounter, 0.92);
 //        MCoC battler = new MCoC("macbook_FCTUNLExternalScreenLarge");
 //        Utils.highlightRegion(battler.r);
 //        battler.tests();
-        battler.controller("second");
+        battler.controller("none");
 
 //        int centerX = battler.r.getCenter().x;
 //        int x = centerX + (battler.r.getW()/4);

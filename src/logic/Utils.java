@@ -1,12 +1,10 @@
 package logic;
 
+import org.sikuli.basics.Settings;
 import org.sikuli.script.*;
 
 import java.io.File;
 
-/**
- * Created by davidnavalho on 01/10/15.
- */
 public class Utils {
 
     public static void setImagesPath(String path){
@@ -28,25 +26,39 @@ public class Utils {
         }
     }
 
-    public static void clickExact(Region r, String image) throws FindFailed{
-        r.click(new Pattern(image).exact());
-    }
-
-    public static Match findExact(Region r, String imagePath){
-        try{
-
-            return r.find(new Pattern(imagePath).exact());
-        }catch(FindFailed e){
-            System.out.println("Searched for exact "+imagePath+", did not find it.");
-            return null;
-        }
-    }
+//    public static void clickExact(Region r, String image) throws FindFailed{
+//        r.click(new Pattern(image).exact());
+//    }
+//
+//    public static Match findExact(Region r, String imagePath){
+//        try{
+//
+//            return r.find(new Pattern(imagePath).exact());
+//        }catch(FindFailed e){
+//            System.out.println("Searched for exact "+imagePath+", did not find it.");
+//            return null;
+//        }
+//    }
 
     public static Match find(Region r, String imagePath){
         try{
             return r.find(imagePath);
         }catch(FindFailed e){
-            System.out.println("Searched for exact "+imagePath+", did not find it.");
+            System.out.println("Searched for "+imagePath+", did not find it.");
+            return null;
+        }
+    }
+
+    //TODO: better method of putting back default similarity
+    public static Match findWithSimilarity(Region r, String imagePath, double similarity){
+        Settings.MinSimilarity = similarity;
+        try{
+            Match m = r.find(imagePath);
+            Settings.MinSimilarity = 0.95;
+            return m;
+        }catch(FindFailed e){
+            System.out.println("Searched for "+imagePath+", did not find it.");
+            Settings.MinSimilarity = 0.95;
             return null;
         }
     }
@@ -55,13 +67,14 @@ public class Utils {
         try {
             Thread.sleep(waitTime*1000);
         } catch (InterruptedException e) {
-
+            //do nothing
         }
     }
 
     public static void clickIfAvailable(Region r, String image){
         try {
-            Utils.clickExact(r, image);
+            r.click(image);
+//            Utils.click(r, image);
         }catch(FindFailed ff){
             System.out.println(image+" not available, skipping.");
         }
