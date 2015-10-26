@@ -49,6 +49,7 @@ public class FightBot {
         while(true){
             if(Utils.find(this.pauseRegion, "pause")!=null) {
                 System.out.println("Throwing some punches!");//TODO: swipes!
+                this.r.dragDrop(this.r.getCenter(),this.attackRegion);//attempt at an opening swipe...
                 for (int i = 0; i < 12; i++) {
                     Utils.click(attackRegion);
                 }
