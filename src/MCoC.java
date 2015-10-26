@@ -16,18 +16,21 @@ public class MCoC {
     private int first = 1;
     private int second = 1;
     private double similarity = 0.90;
+    private String local = "";
 
     private Region topMiddle, tinyUpTop, lowerRight, tinyLowerRight, lowerLeft, regenRegion, thirdBoxRegion, middleColumn, middleLowerColumn;
 
-    public MCoC(String location, int first, int second, double similarity) {
+    public MCoC(String location, int first, int second, double similarity, String localExtraPath) {
+        this.local = localExtraPath;
         this.similarity = similarity;
         Settings.MinSimilarity = this.similarity;
         this.first = 1;
         this.second = 2;
         this.r = this.setScreen(location);
-        Utils.setImagesPath("");
+        Utils.setImagesPath(this.local,"");
         this.setupRegions();
         this.setupFightBot();
+        Utils.highlightRegion(this.r);
     }
 
     private void setupRegions(){
@@ -53,7 +56,7 @@ public class MCoC {
         int x = centerX + (this.r.getW()/4);
         int centerY = this.r.getCenter().y;
         this.fightRegion = new Region(x, centerY,50,50);
-        this.bot = new FightBot(this.r, fightRegion, this.tinyUpTop, this.similarity);
+        this.bot = new FightBot(this.r, fightRegion, this.tinyUpTop, this.similarity,this.local);
     }
 
     private Region getArenaRegion(String arena){
@@ -71,6 +74,9 @@ public class MCoC {
         else if(arena.equalsIgnoreCase("second")) {
             System.out.println("Second Arena Button chosen.");
             return new Region(centerX + xQuarter, centerY + yQuarter + yEight, 50, 25);
+        } else if(arena.equalsIgnoreCase("single")){
+            System.out.println("Single Arena Button chosen.");
+            return new Region(centerX, centerY+yQuarter+yEight,50,25);
         }
         //return first arena by default (i.e.: error, etc
         System.out.println("No known arena identified, choosing first");
@@ -89,7 +95,7 @@ public class MCoC {
             X1 = 480;
             Y1 = 45;
             X2 = 1230;
-            Y2 = 460;
+            Y2 = 465;
 //            Y1 -= 1080;
 //            Y2 -= 1080;
         }else if(location.equalsIgnoreCase("iMac_screen")){
@@ -123,13 +129,15 @@ public class MCoC {
         }catch(FindFailed e){
             System.out.println("Fight failed somehow");
         }
-        Utils.setImagesPath(previousImagesPath);
+        Utils.setImagesPath(this.local,previousImagesPath);
     }
 
     private int secondArenaDoneCounter = 0;
     private int firstArenaDoneCounter = 0;
     //Pre: first+second must always be>0
     private void chooseArena(String fix){
+        if(fix.equalsIgnoreCase("single"))
+            Utils.click(this.getArenaRegion("single"));
         if(fix.equalsIgnoreCase("second"))
             Utils.click(this.getArenaRegion("second"));
         else if(fix.equalsIgnoreCase("first"))
@@ -148,7 +156,7 @@ public class MCoC {
     }
 
     private void uncommonOperations(){
-        Utils.setImagesPath("/control");
+        Utils.setImagesPath(this.local,"/control");
         //Reconnect menu TODO: make it sleep for at least some minutes before reconnecting
         Match m = Utils.find(this.middleColumn, "reconnect");
         if(m!=null) {
@@ -161,11 +169,12 @@ public class MCoC {
         Utils.clickIfAvailable(this.r, "mainMenuFight");
         //Play Versus
         Utils.clickIfAvailable(this.r, "playVersus");
+        Utils.clickIfAvailable(this.r, "playVersus2");
         this.attemptFight("/control");
         //handle clicking on champ by mistake
         this.ifExistsClick("info", "cross");
         //dismiss rate us
-        Utils.clickIfAvailable(this.middleLowerColumn, "later");
+        Utils.clickIfAvailable(this.middleLowerColumn, "later");//TODO:no Macbook Later
     }
 
     private void commonOperations(String fixedArena){
@@ -213,7 +222,7 @@ public class MCoC {
     //TODO: this is currently optimized for the Macbook screen...
     public void controller(String fixedArena){
         while(true) {
-            Utils.setImagesPath("/control");
+            Utils.setImagesPath(this.local,"/control");
             uncommonOperations();
 
             this.attemptFight("/control");
@@ -272,20 +281,23 @@ public class MCoC {
     public void tests(){
         try {
 //            Utils.setImagesPath("/fight");
-            Utils.setImagesPath("/control");
-            this.attemptFight("/control");
+            Utils.setImagesPath(this.local,"/control");
+//            this.attemptFight("/control");
+
 //            Utils.highlightRegion(middleLowerColumn);
 //            Utils.searchAndHighlight(this.r, "continue");
 //            Match match = Utils.find(this.topMiddle, "multiverseArenas");
 //            Utils.highlightRegion(this.tinyLowerRight);
 //            Utils.highlightRegion(this.r);
-//            int centerX = this.r.getCenter().x;
-//            int centerY = this.r.getCenter().y;
-//            int xQuarter = this.r.getW()/4;
-//            int xSixteenth = this.r.getW()/16;
-//            int yQuarter = this.r.getH()/4;
-//            int yEight = this.r.getH()/8;
-//            int ySixteenth = this.r.getH()/16;
+            int centerX = this.r.getCenter().x;
+            int centerY = this.r.getCenter().y;
+            int xQuarter = this.r.getW()/4;
+            int xEight = this.r.getW()/8;
+            int xSixteenth = this.r.getW()/16;
+            int yQuarter = this.r.getH()/4;
+            int yEight = this.r.getH()/8;
+            Region reg = new Region(centerX, centerY+yQuarter+yEight,50,25);
+            Utils.highlightRegion(reg);
 ////            //Third Special bar red (L3 active)
 ////            Region specialBar = new Region(centerX-xSixteenth-xQuarter, centerY+yQuarter+yEight+ySixteenth,35,15);
 ////            Region specialButton = new Region(centerX-xSixteenth*2-xQuarter, centerY+yQuarter+yEight+ySixteenth,35,15);
@@ -316,13 +328,13 @@ public class MCoC {
 
     public static void main(String[] args) {
         //Args:
-        int firstCounter = 3;
-        int secondCounter = 1;
-        MCoC battler = new MCoC("iMac_screen", firstCounter, secondCounter, 0.92);
+        int firstCounter = 1;
+        int secondCounter = 4;
+        MCoC battler = new MCoC("macbook_screen", firstCounter, secondCounter, 0.90, "macbook");
 //        MCoC battler = new MCoC("macbook_FCTUNLExternalScreenLarge");
 //        Utils.highlightRegion(battler.r);
 //        battler.tests();
-        battler.controller("none");
+        battler.controller("first");
 
 //        int centerX = battler.r.getCenter().x;
 //        int x = centerX + (battler.r.getW()/4);

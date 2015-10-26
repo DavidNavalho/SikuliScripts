@@ -15,13 +15,15 @@ public class FightBot {
     Region pauseRegion;
 
     double similarity = 0.95;
+    String localExtraPath = "";
 
-    public FightBot(Region r, Region attackRegion, Region tinyUpTop, double defaultSimilarity){
+    public FightBot(Region r, Region attackRegion, Region tinyUpTop, double defaultSimilarity, String localExtraPath){
         this.r = r;
         this.attackRegion = attackRegion;
         this.setEnergyLocation();
         this.pauseRegion = tinyUpTop;
         this.similarity = defaultSimilarity;
+        this.localExtraPath = localExtraPath;
     }
 
     private void setEnergyLocation(){
@@ -41,7 +43,7 @@ public class FightBot {
     public void fight() throws FindFailed {
         int counter = 0;
         boolean specialActive = false;
-        Utils.setImagesPath("/fight");
+        Utils.setImagesPath(this.localExtraPath,"/fight");
 //        this.r.wait("fightPause", 3);
         System.out.println("Looking for a fight...");
         while(true){

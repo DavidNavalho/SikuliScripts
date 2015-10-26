@@ -7,8 +7,8 @@ import java.io.File;
 
 public class Utils {
 
-    public static void setImagesPath(String path){
-        String pathImgDefault = new File(System.getProperty("user.dir"), "imgs"+path).getAbsolutePath();
+    public static void setImagesPath(String local, String path){
+        String pathImgDefault = new File(System.getProperty("user.dir"), "imgs"+"/"+local+path).getAbsolutePath();
         ImagePath.setBundlePath(pathImgDefault);
         System.out.println("Image paths: " + ImagePath.getPaths());
     }
