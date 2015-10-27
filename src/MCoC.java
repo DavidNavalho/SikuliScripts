@@ -330,9 +330,8 @@ public class MCoC {
         //Args:
         int firstCounter = 1;
         int secondCounter = 5;
-//        MCoC battler = new MCoC("macbook_screen", firstCounter, secondCounter, 0.90, "macbook");
-//        MCoC battler = new MCoC("iMac_small_screen", firstCounter, secondCounter, 0.90, "macbook");
-        MCoC battler = new MCoC("iMac_screen", firstCounter, secondCounter, 0.90, "");
+        MCoC battler = new MCoC("macbook_screen", firstCounter, secondCounter, 0.90, "macbook");
+//        MCoC battler = new MCoC("iMac_screen", firstCounter, secondCounter, 0.90, "");
 //        MCoC battler = new MCoC("macbook_FCTUNLExternalScreenLarge");
 //        Utils.highlightRegion(battler.r);
 //        battler.tests();

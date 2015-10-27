@@ -7,7 +7,7 @@ public class FightBot {
 
     Region r;
     int waitTimer = 30;
-    int punchesRepeat = 2;
+    int punchesRepeat = 3;
 
     Region attackRegion;
     Region specialBar;
@@ -48,11 +48,13 @@ public class FightBot {
         System.out.println("Looking for a fight...");
         while(true){
             if(Utils.find(this.pauseRegion, "pause")!=null) {
-                System.out.println("Throwing some punches!");//TODO: swipes!
-                this.r.dragDrop(this.r.getCenter(),this.attackRegion);//attempt at an opening swipe...
+                System.out.println("Throwing some punches!");
+                //swipe forward
+//                this.r.dragDrop(this.r.getCenter(),this.attackRegion);
+                //attack and...
                 for (int i = 0; i < 12; i++) {
                     Utils.click(attackRegion);
-                }
+                }//if special available, use it
                 if(specialActive)
                     Utils.click(this.specialButton);
                 else {
@@ -61,6 +63,8 @@ public class FightBot {
                         if(Utils.findWithSimilarity(this.specialBar, "specialRed", 0.75, this.similarity) != null)
                             specialActive = true;
                 }
+                //and then swipe back swipes are too slow....
+//                this.r.dragDrop(this.attackRegion,this.r.getCenter());
             }else
                 break;
         }
