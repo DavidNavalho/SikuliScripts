@@ -50,7 +50,7 @@ public class FightBot {
             if(Utils.find(this.pauseRegion, "pause")!=null) {
                 System.out.println("Throwing some punches!");
                 //swipe forward
-//                this.r.dragDrop(this.r.getCenter(),this.attackRegion);
+                this.r.dragDrop(this.r.getCenter(),this.attackRegion);
                 //attack and...
                 for (int i = 0; i < 12; i++) {
                     Utils.click(attackRegion);

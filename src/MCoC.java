@@ -20,10 +20,14 @@ public class MCoC {
 
     private Region topMiddle, tinyUpTop, lowerRight, tinyLowerRight, lowerLeft, regenRegion, thirdBoxRegion, middleColumn, middleLowerColumn;
 
+
+    private Screen s = null;
     public MCoC(String location, int first, int second, double similarity, String localExtraPath) {
+        this.s = new Screen();
         this.local = localExtraPath;
         this.similarity = similarity;
         Settings.MinSimilarity = this.similarity;
+        Settings.AutoWaitTimeout = 1;//TODO: default waittimeout is 3, changed it to 1!
         this.first = 1;
         this.second = 2;
         this.r = this.setScreen(location);
@@ -31,6 +35,10 @@ public class MCoC {
         this.setupRegions();
         this.setupFightBot();
         Utils.highlightRegion(this.r);
+    }
+
+    public void setCatalystClash(int number){
+        this.catalystClash = number;
     }
 
     private void setupRegions(){
@@ -58,6 +66,8 @@ public class MCoC {
         this.fightRegion = new Region(x, centerY,50,50);
         this.bot = new FightBot(this.r, fightRegion, this.tinyUpTop, this.similarity,this.local);
     }
+
+
 
     private Region getArenaRegion(String arena){
         int centerX = this.r.getCenter().x;
@@ -132,9 +142,73 @@ public class MCoC {
         Utils.setImagesPath(this.local,previousImagesPath);
     }
 
+    //TODO: handle error of not finding catalyst area (e.g. when i manually 'help' it find it....(NullPointerException)
+    private void enterCatalystArena(){
+        //repeat up to 3 times
+        for(int i=0;i<15;i++) {
+            if(Utils.find(this.r, "catalystClashArena")==null) {//then it didn't find it, and should 'look' for it'
+                Match m = Utils.find(this.r, "arenaInfo");
+                try {
+                    Location newLocation = new Location(m.getX() - this.r.getW()/4, m.getY());
+//                    this.r.dragDrop(m, newReg);
+//                    this.r.dragDrop(m, newLocation);
+                    this.s.hover(m);
+                    this.s.mouseDown(Button.LEFT);
+                    Utils.sleep(1);
+                    this.s.hover(m.offset(-1,0));
+                    Utils.sleep(1);
+//                    this.s.hover(new Location(m.getX() - 100, m.getY()));
+//                    Utils.sleep(1);
+                    this.s.hover(new Location(m.getX() - (this.r.getW()/40), m.getY()));
+                    Utils.sleep(1);
+                    this.s.hover(new Location(m.getX() - (this.r.getW()/40)*2, m.getY()));
+                    Utils.sleep(1);
+                    this.s.hover(new Location(m.getX() - (this.r.getW()/40)*3, m.getY()));
+                    Utils.sleep(1);
+                    this.s.hover(new Location(m.getX() - (this.r.getW()/40)*4, m.getY()));
+                    Utils.sleep(1);
+                    this.s.hover(new Location(m.getX() - (this.r.getW()/40)*5, m.getY()));
+                    Utils.sleep(1);
+//                    this.s.hover(new Location(m.getX() - 400, m.getY()));
+//                    this.s.hover(new Location(m.getX() - this.r.getW()/16, m.getY()));
+//                    this.s.hover(new Location(m.getX() - this.r.getW()/8, m.getY()));
+//                    this.s.hover(newLocation);
+//                    Utils.sleep(1);
+//                    this.s.drag(m.offset(1,0));
+//                    Utils.sleep(1);
+//                    this.s.drag(new Location(m.getX() - this.r.getW()/8, m.getY()));
+//                    Utils.sleep(1);
+//                    this.s.drag(newLocation);
+                    this.s.mouseUp();
+                    Utils.sleep(2);
+//                    this.r.mouseMove(m);
+//                    this.r.click(m);
+//                    this.r.mouseDown(Button.LEFT);
+//                    Utils.sleep(1);
+//                    this.r.mouseMove(newLocation);
+//                    this.r.mouseUp();
+//                    this.r.dragDrop(m, newLocation);
+                }catch(FindFailed ff){
+                    System.out.println("Did not find Arena to slide.");
+                }
+            }
+        }
+        Match match = null;
+        if((match = Utils.find(this.r, "catalystClashArena"))!=null){//then it found it and should enter it!
+            Region arena = new Region(match.getX(), match.getY()+this.r.getH()/2,match.getW(),match.getH()/4);
+            Utils.click(arena);
+        }else {//TODO:otherwise just 'enter' a random one???
+            System.out.println("Failed to Find CatalystArena, trying a random one...");
+            Utils.clickIfAvailable(this.r, "enterArena");//TODO: can also be continue....
+            Utils.clickIfAvailable(this.r, "continue");//TODO: can also be continue....
+        }
+    }
+
     private int secondArenaDoneCounter = 0;
     private int firstArenaDoneCounter = 0;
-    //Pre: first+second must always be>0
+    private int catalystClashDoneCounter = 0;
+    private int catalystClash = 0;
+    //Pre: sum(arenas) must always be>0
     private void chooseArena(String fix){
         if(fix.equalsIgnoreCase("single"))
             Utils.click(this.getArenaRegion("single"));
@@ -142,7 +216,10 @@ public class MCoC {
             Utils.click(this.getArenaRegion("second"));
         else if(fix.equalsIgnoreCase("first"))
             Utils.click(this.getArenaRegion("first"));
-        else if(this.secondArenaDoneCounter>0){
+        else if(this.catalystClashDoneCounter>0){
+            this.catalystClashDoneCounter--;
+            this.enterCatalystArena();
+        }else if(this.secondArenaDoneCounter>0){
             this.secondArenaDoneCounter--;
             Utils.click(this.getArenaRegion("second"));
         }else if(this.firstArenaDoneCounter>0){
@@ -151,6 +228,7 @@ public class MCoC {
         }else{//If it reaches this, then it's iterated
             this.firstArenaDoneCounter = this.first;
             this.secondArenaDoneCounter = this.second;
+            this.catalystClashDoneCounter = this.catalystClash;
             this.chooseArena(fix);
         }
     }
@@ -282,22 +360,31 @@ public class MCoC {
         try {
 //            Utils.setImagesPath("/fight");
             Utils.setImagesPath(this.local,"/control");
-//            this.attemptFight("/control");
+            this.enterCatalystArena();
 
-//            Utils.highlightRegion(middleLowerColumn);
-//            Utils.searchAndHighlight(this.r, "continue");
-//            Match match = Utils.find(this.topMiddle, "multiverseArenas");
-//            Utils.highlightRegion(this.tinyLowerRight);
-//            Utils.highlightRegion(this.r);
-            int centerX = this.r.getCenter().x;
-            int centerY = this.r.getCenter().y;
-            int xQuarter = this.r.getW()/4;
-            int xEight = this.r.getW()/8;
-            int xSixteenth = this.r.getW()/16;
-            int yQuarter = this.r.getH()/4;
-            int yEight = this.r.getH()/8;
-            Region reg = new Region(centerX, centerY+yQuarter+yEight,50,25);
-            Utils.highlightRegion(reg);
+////            this.attemptFight("/control");
+//                Utils.highlightRegion(Utils.find(this.r,"catalystClashArena"));
+//            Match m = Utils.find(this.r, "catalystClashArena");
+////
+//////            Utils.highlightRegion(middleLowerColumn);
+//////            Utils.searchAndHighlight(this.r, "continue");
+//////            Match match = Utils.find(this.topMiddle, "multiverseArenas");
+//////            Utils.highlightRegion(this.tinyLowerRight);
+//////            Utils.highlightRegion(this.r);
+//            int centerX = this.r.getCenter().x;
+//            int centerY = this.r.getCenter().y;
+//            int xQuarter = this.r.getW()/4;
+//            int xEight = this.r.getW()/8;
+//            int xSixteenth = this.r.getW()/16;
+//            int yHalf = this.r.getH()/2;
+//            int yQuarter = this.r.getH()/4;
+//            int yEight = this.r.getH()/8;
+////
+//            Region enter = new Region(m.getX(), m.getY()+this.r.getH()/2,m.getW(),m.getH()/4);
+//            Utils.highlightRegion(enter);
+
+//            Region reg = new Region(centerX, centerY+yQuarter+yEight,50,25);
+//            Utils.highlightRegion(reg);
 ////            //Third Special bar red (L3 active)
 ////            Region specialBar = new Region(centerX-xSixteenth-xQuarter, centerY+yQuarter+yEight+ySixteenth,35,15);
 ////            Region specialButton = new Region(centerX-xSixteenth*2-xQuarter, centerY+yQuarter+yEight+ySixteenth,35,15);
@@ -328,10 +415,12 @@ public class MCoC {
 
     public static void main(String[] args) {
         //Args:
-        int firstCounter = 1;
-        int secondCounter = 5;
-        MCoC battler = new MCoC("macbook_screen", firstCounter, secondCounter, 0.90, "macbook");
-//        MCoC battler = new MCoC("iMac_screen", firstCounter, secondCounter, 0.90, "");
+        int firstCounter = 5;
+        int secondCounter = 1;
+        int catalyst = 3;
+//        MCoC battler = new MCoC("macbook_screen", firstCounter, secondCounter, 0.90, "macbook");
+        MCoC battler = new MCoC("iMac_screen", firstCounter, secondCounter, 0.90, "");
+        battler.setCatalystClash(catalyst);
 //        MCoC battler = new MCoC("macbook_FCTUNLExternalScreenLarge");
 //        Utils.highlightRegion(battler.r);
 //        battler.tests();
