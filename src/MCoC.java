@@ -169,25 +169,8 @@ public class MCoC {
                     Utils.sleep(1);
                     this.s.hover(new Location(m.getX() - (this.r.getW()/40)*5, m.getY()));
                     Utils.sleep(1);
-//                    this.s.hover(new Location(m.getX() - 400, m.getY()));
-//                    this.s.hover(new Location(m.getX() - this.r.getW()/16, m.getY()));
-//                    this.s.hover(new Location(m.getX() - this.r.getW()/8, m.getY()));
-//                    this.s.hover(newLocation);
-//                    Utils.sleep(1);
-//                    this.s.drag(m.offset(1,0));
-//                    Utils.sleep(1);
-//                    this.s.drag(new Location(m.getX() - this.r.getW()/8, m.getY()));
-//                    Utils.sleep(1);
-//                    this.s.drag(newLocation);
                     this.s.mouseUp();
                     Utils.sleep(2);
-//                    this.r.mouseMove(m);
-//                    this.r.click(m);
-//                    this.r.mouseDown(Button.LEFT);
-//                    Utils.sleep(1);
-//                    this.r.mouseMove(newLocation);
-//                    this.r.mouseUp();
-//                    this.r.dragDrop(m, newLocation);
                 }catch(FindFailed ff){
                     System.out.println("Did not find Arena to slide.");
                 }
@@ -203,6 +186,21 @@ public class MCoC {
             Utils.clickIfAvailable(this.r, "continue");//TODO: can also be continue....
         }
     }
+    private void enterCornucopia(){
+        Match m =  Utils.find(this.r, "crystalCornucopia");
+        if(m!=null){
+            Region clickRegion = new Region(m.getX(), m.getY()+this.r.getH()/2, m.getW(), m.getH());
+            Utils.click(clickRegion);
+        }else
+            System.out.println("Couldn't find Crystal Cornucopia");
+//        Utils.clickIfAvailable(this.r, );
+    }
+
+    private boolean cornucopiaActive(){
+        if(Utils.find(this.r, "crystalCornucopia")!=null)
+            return true;
+        return false;
+    }
 
     private int secondArenaDoneCounter = 0;
     private int firstArenaDoneCounter = 0;
@@ -216,9 +214,13 @@ public class MCoC {
             Utils.click(this.getArenaRegion("second"));
         else if(fix.equalsIgnoreCase("first"))
             Utils.click(this.getArenaRegion("first"));
-        else if(this.catalystClashDoneCounter>0){
+        else if(this.catalystClashDoneCounter>0) {
             this.catalystClashDoneCounter--;
             this.enterCatalystArena();
+        }else if(this.cornucopiaActive()){//basically, use both first and second counters
+            this.firstArenaDoneCounter--;
+            this.secondArenaDoneCounter--;
+            this.enterCornucopia();
         }else if(this.secondArenaDoneCounter>0){
             this.secondArenaDoneCounter--;
             Utils.click(this.getArenaRegion("second"));
@@ -415,11 +417,11 @@ public class MCoC {
 
     public static void main(String[] args) {
         //Args:
-        int firstCounter = 5;
+        int firstCounter = 7;
         int secondCounter = 1;
-        int catalyst = 3;
-//        MCoC battler = new MCoC("macbook_screen", firstCounter, secondCounter, 0.90, "macbook");
-        MCoC battler = new MCoC("iMac_screen", firstCounter, secondCounter, 0.90, "");
+        int catalyst = 0;
+        MCoC battler = new MCoC("macbook_screen", firstCounter, secondCounter, 0.90, "macbook");
+//        MCoC battler = new MCoC("iMac_screen", firstCounter, secondCounter, 0.90, "");
         battler.setCatalystClash(catalyst);
 //        MCoC battler = new MCoC("macbook_FCTUNLExternalScreenLarge");
 //        Utils.highlightRegion(battler.r);

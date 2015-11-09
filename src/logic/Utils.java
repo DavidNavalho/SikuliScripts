@@ -71,6 +71,21 @@ public class Utils {
         }
     }
 
+    public static void clickAnyIfAvailable(Region r, String option1, String option2, double similarity){
+        try {
+//            Settings.MinSimilarity = 0.30;
+            r.click(option1);
+        }catch(FindFailed ff){
+            System.out.println(option1+" not available, trying "+option2+".");
+            try {
+                r.click(option2);
+            }catch(FindFailed ff2){
+                System.out.println(option2+" not available.");
+            }
+        }
+//        Settings.MinSimilarity = similarity;
+    }
+
     public static void clickIfAvailable(Region r, String image){
         try {
             r.click(image);
