@@ -114,6 +114,12 @@ public class MCoC {
             Y1 = 45;
             X2 = 2510;
             Y2 = 825;
+        }else if(location.equalsIgnoreCase("iMac_bluestacks")){
+            sn = 0;
+            X1 = 1280;
+            Y1 = 45;
+            X2 = 2560;
+            Y2 = 715;
         }
         Screen s = new Screen(sn);
         return s.setRect(X1, Y1, X2-X1, Y2-Y1);
@@ -274,8 +280,8 @@ public class MCoC {
         //fightStuff
         this.attemptFight("/control");
         //statsKO, victory
-        this.ifExistsClick("statsKO","continueHighlighted");
-        this.ifExistsClick("stats","continueHighlighted");
+        this.ifExistsClick("statsKO","statsKO");
+        this.ifExistsClick("stats","stats");
 
     }
 
@@ -417,11 +423,11 @@ public class MCoC {
 
     public static void main(String[] args) {
         //Args:
-        int firstCounter = 7;
-        int secondCounter = 1;
+        int firstCounter = 1;
+        int secondCounter = 5;
         int catalyst = 0;
-        MCoC battler = new MCoC("macbook_screen", firstCounter, secondCounter, 0.90, "macbook");
-//        MCoC battler = new MCoC("iMac_screen", firstCounter, secondCounter, 0.90, "");
+//        MCoC battler = new MCoC("macbook_screen", firstCounter, secondCounter, 0.90, "macbook");
+        MCoC battler = new MCoC("iMac_bluestacks", firstCounter, secondCounter, 0.90, "bluestacks/iMac");
         battler.setCatalystClash(catalyst);
 //        MCoC battler = new MCoC("macbook_FCTUNLExternalScreenLarge");
 //        Utils.highlightRegion(battler.r);
