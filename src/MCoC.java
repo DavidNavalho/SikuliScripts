@@ -41,6 +41,10 @@ public class MCoC {
         this.catalystClash = number;
     }
 
+    public void setCornucopia(int number){
+        this.cornucopia = number;
+    }
+
     private void setupRegions(){
         int height = this.r.getH();
         int width = this.r.getW();
@@ -120,6 +124,12 @@ public class MCoC {
             Y1 = 45;
             X2 = 2560;
             Y2 = 715;
+        }else if(location.equalsIgnoreCase("macbook_bluestacks")){
+            sn = 0;
+            X1 = 130;
+            Y1 = 45;
+            X2 = 1280;
+            Y2 = 645;
         }
         Screen s = new Screen(sn);
         return s.setRect(X1, Y1, X2-X1, Y2-Y1);
@@ -192,6 +202,9 @@ public class MCoC {
             Utils.clickIfAvailable(this.r, "continue");//TODO: can also be continue....
         }
     }
+
+    //TODO: enter cornucopia based on relative position to cornucopia found image, not a fixed position
+    //position may change due to looking for catalystClash
     private void enterCornucopia(){
         Match m =  Utils.find(this.r, "crystalCornucopia");
         if(m!=null){
@@ -212,6 +225,8 @@ public class MCoC {
     private int firstArenaDoneCounter = 0;
     private int catalystClashDoneCounter = 0;
     private int catalystClash = 0;
+    private int cornucopia = 1;
+    private int cornucopiaDoneCounter = 0;
     //Pre: sum(arenas) must always be>0
     private void chooseArena(String fix){
         if(fix.equalsIgnoreCase("single"))
@@ -223,9 +238,11 @@ public class MCoC {
         else if(this.catalystClashDoneCounter>0) {
             this.catalystClashDoneCounter--;
             this.enterCatalystArena();
-        }else if(this.cornucopiaActive()){//basically, use both first and second counters
-            this.firstArenaDoneCounter--;
-            this.secondArenaDoneCounter--;
+        }else if(this.cornucopiaActive() && this.cornucopiaDoneCounter>0){
+            this.cornucopiaDoneCounter--;
+            //if cornucopia is active, the others are not, thus set them to zero
+            this.firstArenaDoneCounter = 0;
+            this.secondArenaDoneCounter = 0;
             this.enterCornucopia();
         }else if(this.secondArenaDoneCounter>0){
             this.secondArenaDoneCounter--;
@@ -237,6 +254,7 @@ public class MCoC {
             this.firstArenaDoneCounter = this.first;
             this.secondArenaDoneCounter = this.second;
             this.catalystClashDoneCounter = this.catalystClash;
+            this.cornucopiaDoneCounter = this.cornucopia;
             this.chooseArena(fix);
         }
     }
@@ -286,9 +304,9 @@ public class MCoC {
     }
 
     private void takeCareofRegens(){
-        while(Utils.find(this.regenRegion, "regenBox")!=null) {
-            Utils.clickIfAvailable(this.r, "cross");
-            Utils.click(this.regenRegion.getLastMatch());
+        while(Utils.find(this.r, "regenBox")!=null) {
+//            Utils.clickIfAvailable(this.r, "cross");
+            Utils.clickIfAvailable(this.r, "regenBox");
         }
     }
 
@@ -298,6 +316,8 @@ public class MCoC {
                 takeCareofRegens();//needs to be part of the logic here;
                 //TODO: 'fallback' if the first one has that clock icon - means this roster is full, and we should go back and do another arena
                 Utils.clickIfAvailable(this.r, "cross");
+                Utils.sleep(3);
+                takeCareofRegens();
                 this.r.dragDrop(this.regenRegion,this.thirdBoxRegion);
             }
         }catch(FindFailed e){
@@ -421,14 +441,19 @@ public class MCoC {
         }
     }
 
+
+    //Catalyst start: Sun, 15Nov, 23:00
+    //TODO: better method of identifying catalystClash appearance, even if by date?
     public static void main(String[] args) {
         //Args:
-        int firstCounter = 1;
-        int secondCounter = 5;
-        int catalyst = 0;
-//        MCoC battler = new MCoC("macbook_screen", firstCounter, secondCounter, 0.90, "macbook");
-        MCoC battler = new MCoC("iMac_bluestacks", firstCounter, secondCounter, 0.90, "bluestacks/iMac");
+        int firstCounter = 3;
+        int secondCounter = 7;
+        int cornucopiaCounter = 1;
+        int catalyst = 6;
+        MCoC battler = new MCoC("macbook_bluestacks", firstCounter, secondCounter, 0.90, "bluestacks/macbook");
+//        MCoC battler = new MCoC("iMac_bluestacks", firstCounter, secondCounter, 0.90, "bluestacks/iMac");
         battler.setCatalystClash(catalyst);
+        battler.setCornucopia(cornucopiaCounter);
 //        MCoC battler = new MCoC("macbook_FCTUNLExternalScreenLarge");
 //        Utils.highlightRegion(battler.r);
 //        battler.tests();
