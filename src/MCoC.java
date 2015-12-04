@@ -4,6 +4,7 @@ import org.sikuli.basics.Settings;
 import org.sikuli.script.*;
 
 import java.io.File;
+import java.util.Random;
 
 public class MCoC {
     public Region r;
@@ -13,6 +14,7 @@ public class MCoC {
     private FightBot bot = null;
     private Region fightRegion = null;
     private int defaultReconnectWait = 15; //minutes
+    private int defaultMaxReconnectWait = 30;
     private int first = 1;
     private int second = 1;
     private double similarity = 0.90;
@@ -161,7 +163,7 @@ public class MCoC {
     //TODO: handle error of not finding catalyst area (e.g. when i manually 'help' it find it....(NullPointerException)
     private void enterCatalystArena(){
         //repeat up to 3 times
-        for(int i=0;i<15;i++) {
+        for(int i=0;i<15;i++) {//TODO: problems with catalyst arena not found and null pointers...
             if(Utils.find(this.r, "catalystClashArena")==null) {//then it didn't find it, and should 'look' for it'
                 Match m = Utils.find(this.r, "arenaInfo");
                 try {
@@ -264,8 +266,10 @@ public class MCoC {
         //Reconnect menu TODO: make it sleep for at least some minutes before reconnecting
         Match m = Utils.find(this.middleColumn, "reconnect");
         if(m!=null) {
-            System.out.println("Reconnect found, sleeping " + this.defaultReconnectWait+" minutes.");
-            Utils.sleep(this.defaultReconnectWait*60);
+            Random rnd = new Random();
+            int wait = rnd.nextInt(this.defaultMaxReconnectWait-this.defaultReconnectWait);
+            System.out.println("Reconnect found, sleeping " + (this.defaultReconnectWait+wait) + " minutes.");
+            Utils.sleep((this.defaultReconnectWait+wait)*60);
             Utils.clickIfAvailable(this.middleColumn, "reconnect");
         }
         this.attemptFight("/control");
@@ -446,12 +450,13 @@ public class MCoC {
     //TODO: better method of identifying catalystClash appearance, even if by date?
     public static void main(String[] args) {
         //Args:
-        int firstCounter = 3;
-        int secondCounter = 7;
-        int cornucopiaCounter = 1;
-        int catalyst = 6;
-        MCoC battler = new MCoC("macbook_bluestacks", firstCounter, secondCounter, 0.90, "bluestacks/macbook");
+        int firstCounter = 1;
+        int secondCounter = 2;
+        int cornucopiaCounter = 3;
+        int catalyst = 12;//TODO: missing arena info picture!!!
+//        MCoC battler = new MCoC("macbook_bluestacks", firstCounter, secondCounter, 0.90, "bluestacks/macbook");
 //        MCoC battler = new MCoC("iMac_bluestacks", firstCounter, secondCounter, 0.90, "bluestacks/iMac");
+        MCoC battler = new MCoC("iMac_screen", firstCounter, secondCounter, 0.90, "");
         battler.setCatalystClash(catalyst);
         battler.setCornucopia(cornucopiaCounter);
 //        MCoC battler = new MCoC("macbook_FCTUNLExternalScreenLarge");
