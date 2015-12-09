@@ -2,8 +2,13 @@ import logic.FightBot;
 import logic.Utils;
 import org.sikuli.basics.Settings;
 import org.sikuli.script.*;
+import tasks.Control;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 import java.util.Random;
 
 public class MCoC {
@@ -14,7 +19,7 @@ public class MCoC {
     private FightBot bot = null;
     private Region fightRegion = null;
     private int defaultReconnectWait = 15; //minutes
-    private int defaultMaxReconnectWait = 30;
+    private int defaultMaxReconnectWait = 20; //minutes
     private int first = 1;
     private int second = 1;
     private double similarity = 0.90;
@@ -22,21 +27,62 @@ public class MCoC {
 
     private Region topMiddle, tinyUpTop, lowerRight, tinyLowerRight, lowerLeft, regenRegion, thirdBoxRegion, middleColumn, middleLowerColumn;
 
+    //TODO: make reconnect a bit more aggressive: the game sometimes goes through multiple reconnects. Make an internal timeout before it gives up pressing reconnect again
+    //TODO: remote enable/disable would be awesome! no clue how to do that, though...
+    //TODO: core images actually required to make it work; fight images; extra images that are always clickable, and can be added to a folder!
 
     private Screen s = null;
-    public MCoC(String location, int first, int second, double similarity, String localExtraPath) {
+    private Properties prop;
+    public MCoC() {
+        this.loadProperties();
         this.s = new Screen();
-        this.local = localExtraPath;
-        this.similarity = similarity;
+        this.local = "/"+this.getStringProperty("picsFolder");//localExtraPath;
+        this.similarity = this.getDoubleProperty("similarity");
         Settings.MinSimilarity = this.similarity;
-        Settings.AutoWaitTimeout = 1;//TODO: default waittimeout is 3, changed it to 1!
-        this.first = 1;
-        this.second = 2;
-        this.r = this.setScreen(location);
-        Utils.setImagesPath(this.local,"");
+        Settings.AutoWaitTimeout = this.getIntProperty("autoWaitTimeout");//TODO: default waittimeout is 3, changed it to 1! what about 0?
+        this.first = this.getIntProperty("firstArena");
+        this.second = this.getIntProperty("secondArena");
+        this.setCatalystClash(this.getIntProperty("catalystClashArena"));
+        this.setCornucopia(this.getIntProperty("cornucopiaArena"));
+        this.r = this.setScreen();
+//        Utils.setImagesPath(this.local,"");
         this.setupRegions();
         this.setupFightBot();
         Utils.highlightRegion(this.r);
+        this.ctl = new Control();
+        ctl.start();
+    }
+    private Control ctl;
+
+    private void loadProperties(){
+        this.prop = new Properties();
+        InputStream input = null;
+        try{
+            input = new FileInputStream("config.properties");
+            prop.load(input);
+        }catch (IOException ex) {
+            ex.printStackTrace();
+        } finally {
+            if (input != null) {
+                try {
+                    input.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    private String getStringProperty(String key){
+        return this.prop.getProperty(key);
+    }
+
+    private int getIntProperty(String key){
+        return new Integer(this.prop.getProperty(key));
+    }
+
+    private double getDoubleProperty(String key){
+        return new Double(this.prop.getProperty(key));
     }
 
     public void setCatalystClash(int number){
@@ -99,6 +145,20 @@ public class MCoC {
         return new Region(centerX-xEight-xSixteenth, centerY+yQuarter+yEight,50,25);
     }
 
+    private Region setScreen(){
+        App app = new App("player");
+        app.focus(2);
+
+//        System.out.println("> Coordinates: "+app.window(2).getX()+","+app.window(2).getY());
+//        System.out.println("> ...to: "+app.window(2).getW()+","+app.window(2).getH());
+        X1 = app.window(2).getX();
+        Y1 = app.window(2).getY();
+        X2 = app.window(2).getW();
+        Y2 = app.window(2).getH();
+        this.s = new Screen();
+        return s.setRect(X1, Y1, X2, Y2);
+    }
+
 
     private Region setScreen(String location){
         int sn = 0;
@@ -133,7 +193,7 @@ public class MCoC {
             X2 = 1280;
             Y2 = 645;
         }
-        Screen s = new Screen(sn);
+        this.s = new Screen(sn);
         return s.setRect(X1, Y1, X2-X1, Y2-Y1);
     }
 
@@ -199,9 +259,7 @@ public class MCoC {
             Region arena = new Region(match.getX(), match.getY()+this.r.getH()/2,match.getW(),match.getH()/4);
             Utils.click(arena);
         }else {//TODO:otherwise just 'enter' a random one???
-            System.out.println("Failed to Find CatalystArena, trying a random one...");
-            Utils.clickIfAvailable(this.r, "enterArena");//TODO: can also be continue....
-            Utils.clickIfAvailable(this.r, "continue");//TODO: can also be continue....
+            System.out.println("Failed to Find CatalystArena...");
         }
     }
 
@@ -230,14 +288,8 @@ public class MCoC {
     private int cornucopia = 1;
     private int cornucopiaDoneCounter = 0;
     //Pre: sum(arenas) must always be>0
-    private void chooseArena(String fix){
-        if(fix.equalsIgnoreCase("single"))
-            Utils.click(this.getArenaRegion("single"));
-        if(fix.equalsIgnoreCase("second"))
-            Utils.click(this.getArenaRegion("second"));
-        else if(fix.equalsIgnoreCase("first"))
-            Utils.click(this.getArenaRegion("first"));
-        else if(this.catalystClashDoneCounter>0) {
+    private void chooseArena(){
+        if(this.catalystClashDoneCounter>0) {
             this.catalystClashDoneCounter--;
             this.enterCatalystArena();
         }else if(this.cornucopiaActive() && this.cornucopiaDoneCounter>0){
@@ -257,7 +309,6 @@ public class MCoC {
             this.secondArenaDoneCounter = this.second;
             this.catalystClashDoneCounter = this.catalystClash;
             this.cornucopiaDoneCounter = this.cornucopia;
-            this.chooseArena(fix);
         }
     }
 
@@ -277,32 +328,34 @@ public class MCoC {
         Utils.clickIfAvailable(this.r, "mainMenuFight");
         //Play Versus
         Utils.clickIfAvailable(this.r, "playVersus");
-        Utils.clickIfAvailable(this.r, "playVersus2");
         this.attemptFight("/control");
         //handle clicking on champ by mistake
         this.ifExistsClick("info", "cross");
         //dismiss rate us
-        Utils.clickIfAvailable(this.middleLowerColumn, "later");//TODO:no Macbook Later
     }
 
-    private void commonOperations(String fixedArena){
+    private void rareOperations(){
+        Utils.setImagesPath(this.local,"/click");
+        Utils.clickIfAvailable(this.r, "later");
+    }
+
+    private void commonOperations(){
+        Utils.setImagesPath(this.local,"/control");
         //Check for Arenas, enter one:
         Match match = Utils.find(this.topMiddle, "multiverseArenas");
         if (match != null)
-            this.chooseArena(fixedArena);
+            this.chooseArena();
         //fill up boxes
         this.fillBoxes();
         this.attemptFight("/control");
         //click findMatch if available
         Utils.clickIfAvailable(this.lowerLeft, "findMatch");
         //seriesMatchScreen
-        this.ifExistsClick("findNewMatch", "continue");
         Utils.clickIfAvailable(this.lowerRight, "accept");
         Utils.clickIfAvailable(this.tinyLowerRight, "continue");
         //fightStuff
         this.attemptFight("/control");
         //statsKO, victory
-        this.ifExistsClick("statsKO","statsKO");
         this.ifExistsClick("stats","stats");
 
     }
@@ -330,18 +383,20 @@ public class MCoC {
     }
 
     //TODO: this is currently optimized for the Macbook screen...
-    public void controller(String fixedArena){
+    public void controller(){
         while(true) {
             Utils.setImagesPath(this.local,"/control");
             uncommonOperations();
+            rareOperations();
 
             this.attemptFight("/control");
-            commonOperations(fixedArena);
+            commonOperations();
             this.attemptFight("/control");
-            commonOperations(fixedArena);
+            commonOperations();
             this.attemptFight("/control");
-            commonOperations(fixedArena);
+            commonOperations();
             this.attemptFight("/control");
+
             //botFight
 
             //Attempt at any continue (may need 2 (highlited) or more(all different))
@@ -449,33 +504,9 @@ public class MCoC {
     //Catalyst start: Sun, 15Nov, 23:00
     //TODO: better method of identifying catalystClash appearance, even if by date?
     public static void main(String[] args) {
-        //Args:
-        int firstCounter = 1;
-        int secondCounter = 2;
-        int cornucopiaCounter = 3;
-        int catalyst = 12;//TODO: missing arena info picture!!!
-//        MCoC battler = new MCoC("macbook_bluestacks", firstCounter, secondCounter, 0.90, "bluestacks/macbook");
-//        MCoC battler = new MCoC("iMac_bluestacks", firstCounter, secondCounter, 0.90, "bluestacks/iMac");
-        MCoC battler = new MCoC("iMac_screen", firstCounter, secondCounter, 0.90, "");
-        battler.setCatalystClash(catalyst);
-        battler.setCornucopia(cornucopiaCounter);
-//        MCoC battler = new MCoC("macbook_FCTUNLExternalScreenLarge");
-//        Utils.highlightRegion(battler.r);
-//        battler.tests();
-        battler.controller("none");
-
-//        int centerX = battler.r.getCenter().x;
-//        int x = centerX + (battler.r.getW()/4);
-//        int centerY = battler.r.getCenter().y;
-//        Region fightRegion = new Region(x, centerY,50,50);
-//        Utils.highlightRegion(testRegion);
-
-//        FightBot bot = new FightBot(battler.r, fightRegion);
-//        try {
-//            bot.fight();
-//        }catch(Exception e){
-//            e.printStackTrace();
-//        }
+//        MCoC battler = new MCoC("macbook_screen", firstCounter, secondCounter, 0.90, "macbook");
+        MCoC battler = new MCoC();
+        battler.controller();
 
     }
 }
