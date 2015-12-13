@@ -150,7 +150,8 @@ public class MCoC {
         App app = new App(this.getStringProperty("app"));//"player");
         int appWindow = this.getIntProperty("appWindow");
         app.focus(appWindow);//2);
-
+//        System.out.println("appwindow: "+appWindow);
+//        Utils.highlightRegion(app.window(0));
 //        System.out.println("> Coordinates: "+app.window(2).getX()+","+app.window(2).getY());
 //        System.out.println("> ...to: "+app.window(2).getW()+","+app.window(2).getH());
         X1 = app.window(appWindow).getX();
