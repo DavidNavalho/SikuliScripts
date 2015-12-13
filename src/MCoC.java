@@ -25,7 +25,7 @@ public class MCoC {
     private double similarity = 0.90;
     private String local = "";
 
-    private Region topMiddle, tinyUpTop, lowerRight, tinyLowerRight, lowerLeft, regenRegion, thirdBoxRegion, middleColumn, middleLowerColumn;
+    private Region topMiddle, lowerRight, lowerLeft, regenRegion, thirdBoxRegion, middleColumn, middleLowerColumn;
 
     //TODO: make reconnect a bit more aggressive: the game sometimes goes through multiple reconnects. Make an internal timeout before it gives up pressing reconnect again
     //TODO: remote enable/disable would be awesome! no clue how to do that, though...
@@ -101,14 +101,15 @@ public class MCoC {
         int eightWidth = width/8;
         //topMiddle: x,y => X1+quarterWidth, Y1; size: experiment
         this.topMiddle = new Region(X1+quarterWidth, Y1, width/2, height/2);
-        this.tinyUpTop = new Region(X1+quarterWidth+eightWidth+width/16, Y1, eightWidth, height/8);
+//        this.tinyUpTop = new Region(X1+quarterWidth+eightWidth+width/16, Y1, eightWidth, height/8);
         this.lowerRight = new Region(X2-width/2, Y2-quarterHeight, width/2, quarterHeight);
-        this.tinyLowerRight = new Region(X2-width/6, Y2-height/9, width/6, height/9);
-        this.regenRegion = new Region(X1+quarterWidth, Y1+quarterHeight, eightWidth, quarterHeight);
-        this.thirdBoxRegion = new Region(X1+width/16, Y1+2*height/5, 3*width/20, 3*height/20);
+//        this.tinyLowerRight = new Region(X2-width/6, Y2-height/9, width/6, height/9);
+        this.regenRegion = new Region(X1+quarterWidth, Y1+quarterHeight, eightWidth, quarterHeight);//TODO: could do with enlarging it...
+        this.thirdBoxRegion = new Region(X1+width/16, Y1+2*height/5, 3*width/20, 3*height/18);
         this.middleColumn = new Region(X1+quarterWidth, Y1, width/2, height);
         this.middleLowerColumn = new Region(X1+quarterWidth, Y1+height/2, width/2, height/2);
         this.lowerLeft = new Region(X1, Y2-quarterHeight, quarterWidth, quarterHeight);
+//        Utils.highlightRegion(this.lowerLeft);
     }
 
     private void setupFightBot(){
@@ -116,9 +117,9 @@ public class MCoC {
         int x = centerX + (this.r.getW()/4);
         int centerY = this.r.getCenter().y;
         this.fightRegion = new Region(x, centerY,50,50);
-        this.bot = new FightBot(this.r, fightRegion, this.tinyUpTop, this.similarity,this.local);
-    }
-
+        this.bot = new FightBot(this.r, fightRegion, this.topMiddle, this.similarity,this.local);
+    }//TODO: randomly vary amount of hits during fight;
+//TODO: the continue REALLY needs to be on the small enclosed box, i think....
 
 
     private Region getArenaRegion(String arena){
@@ -146,17 +147,18 @@ public class MCoC {
     }
 
     private Region setScreen(){
-        App app = new App("player");
-        app.focus(2);
+        App app = new App(this.getStringProperty("app"));//"player");
+        int appWindow = this.getIntProperty("appWindow");
+        app.focus(appWindow);//2);
 
 //        System.out.println("> Coordinates: "+app.window(2).getX()+","+app.window(2).getY());
 //        System.out.println("> ...to: "+app.window(2).getW()+","+app.window(2).getH());
-        X1 = app.window(2).getX();
-        Y1 = app.window(2).getY();
-        X2 = app.window(2).getW();
-        Y2 = app.window(2).getH();
+        X1 = app.window(appWindow).getX();
+        Y1 = app.window(appWindow).getY();
+        X2 = app.window(appWindow).getW()+X1;
+        Y2 = app.window(appWindow).getH()+Y1;
         this.s = new Screen();
-        return s.setRect(X1, Y1, X2, Y2);
+        return s.setRect(X1, Y1, X2-X1, Y2-Y1);
     }
 
 
@@ -352,7 +354,8 @@ public class MCoC {
         Utils.clickIfAvailable(this.lowerLeft, "findMatch");
         //seriesMatchScreen
         Utils.clickIfAvailable(this.lowerRight, "accept");
-        Utils.clickIfAvailable(this.tinyLowerRight, "continue");
+//        Utils.highlightRegion(this.tinyLowerRight);
+        Utils.clickIfAvailable(this.lowerRight, "continue");
         //fightStuff
         this.attemptFight("/control");
         //statsKO, victory
@@ -369,7 +372,7 @@ public class MCoC {
 
     private void fillBoxes(){
         try {
-            while (Utils.find(this.thirdBoxRegion, "availableSpot") != null) {
+            while (Utils.find(this.thirdBoxRegion, "thirdAvailableSpot") != null) {
                 takeCareofRegens();//needs to be part of the logic here;
                 //TODO: 'fallback' if the first one has that clock icon - means this roster is full, and we should go back and do another arena
                 Utils.clickIfAvailable(this.r, "cross");
@@ -396,50 +399,6 @@ public class MCoC {
             this.attemptFight("/control");
             commonOperations();
             this.attemptFight("/control");
-
-            //botFight
-
-            //Attempt at any continue (may need 2 (highlited) or more(all different))
-//            this.clickIfAvailable("continue");
-//            this.clickIfAvailable("accept");
-
-                //Utils.click(match.offset(0, 310));
-
-            //Edit Team:
-//            try {             //TODO: maybe not base it on edit team, but on empty box instead...??
-//                Match boxMatch = Utils.findExact(this.r, "availableSpot");
-//                if (boxMatch != null) {
-//                    Match editTeam = Utils.findExact(this.r, "editTeam");
-//                    Region champ = editTeam.offset(-200, 100);
-//                    Region emptyBox = editTeam.offset(-380, 135);
-//                    this.r.dragDrop(champ, emptyBox);
-//                }
-//            } catch (FindFailed e) {
-//                System.out.println("Failed on Edit Team...");
-//            }
-//            try {
-//                if ((Utils.findExact(this.r, "editTeam") != null) && (Utils.findExact(this.r, "availableSpot") == null))
-//                    Utils.clickExact(this.r, "findMatch");
-//            } catch (FindFailed e) {
-//                System.out.println("Failed somehow on clicking findMatch");
-//            }
-            //fight won (lost too?)
-//            Match fightFinished = Utils.find(this.r, "stats");
-//            if(fightFinished!=null){
-//                Region continueButton = fightFinished.offset(0,75);
-//                Utils.click(continueButton);
-//            }
-//            //fight lost (won too?)
-//            Match fightFinishedKO = Utils.find(this.r, "stats2");
-//            if(fightFinishedKO!=null){
-//                Region continueButton = fightFinishedKO.offset(0,75);
-//                Utils.click(continueButton);
-//            }
-////            'random' click from fight region
-//            Utils.click(this.fightRegion);
-//            //botFight
-//            this.attemptFight("/control");
-//            Utils.sleep(5);
         }
     }
 
