@@ -230,7 +230,7 @@ public class MCoC {
             if(Utils.find(this.r, "catalystClashArena")==null) {//then it didn't find it, and should 'look' for it'
                 Match m = Utils.find(this.r, "arenaInfo");
                 try {
-                    Location newLocation = new Location(m.getX() - this.r.getW()/4, m.getY());
+//                    Location newLocation = new Location(m.getX() - this.r.getW()/4, m.getY());
 //                    this.r.dragDrop(m, newReg);
 //                    this.r.dragDrop(m, newLocation);
                     this.s.hover(m);
@@ -254,6 +254,9 @@ public class MCoC {
                     Utils.sleep(2);
                 }catch(FindFailed ff){
                     System.out.println("Did not find Arena to slide.");
+                }catch(NullPointerException np){
+                    System.out.println("failed at finding something, skipping and retrying...");
+                    this.s.mouseUp();
                 }
             }
         }
@@ -292,15 +295,15 @@ public class MCoC {
     private int cornucopiaDoneCounter = 0;
     //Pre: sum(arenas) must always be>0
     private void chooseArena(){
-        if(this.catalystClashDoneCounter>0) {
-            this.catalystClashDoneCounter--;
-            this.enterCatalystArena();
-        }else if(this.cornucopiaActive() && this.cornucopiaDoneCounter>0){
+        if(this.cornucopiaActive() && this.cornucopiaDoneCounter>0){
             this.cornucopiaDoneCounter--;
             //if cornucopia is active, the others are not, thus set them to zero
             this.firstArenaDoneCounter = 0;
             this.secondArenaDoneCounter = 0;
             this.enterCornucopia();
+        }else if(this.catalystClashDoneCounter>0) {
+            this.catalystClashDoneCounter--;
+            this.enterCatalystArena();
         }else if(this.secondArenaDoneCounter>0){
             this.secondArenaDoneCounter--;
             Utils.click(this.getArenaRegion("second"));
@@ -335,6 +338,7 @@ public class MCoC {
         //handle clicking on champ by mistake
         this.ifExistsClick("info", "cross");
         //dismiss rate us
+        this.ifExistsClick("rankRewards","backButton");
     }
 
     private void rareOperations(){

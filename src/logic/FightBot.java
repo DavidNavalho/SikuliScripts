@@ -7,7 +7,7 @@ public class FightBot {
 
     Region r;
     int waitTimer = 30;
-    int punchesRepeat = 3;
+    int punchesRepeat = 1;
 
     Region attackRegion;
     Region specialBar;
@@ -52,7 +52,7 @@ public class FightBot {
                 //swipe forward
                 this.r.dragDrop(this.r.getCenter(),this.attackRegion);
                 //attack and...
-                for (int i = 0; i < 12; i++) {
+                for (int i = 0; i < 8; i++) {
                     Utils.click(attackRegion);
                 }//if special available, use it
                 if(specialActive)
