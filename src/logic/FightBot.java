@@ -1,7 +1,11 @@
 package logic;
 
+import org.sikuli.basics.Settings;
+import org.sikuli.script.Button;
 import org.sikuli.script.FindFailed;
 import org.sikuli.script.Region;
+
+import java.util.Properties;
 
 public class FightBot {
 
@@ -9,21 +13,32 @@ public class FightBot {
     int waitTimer = 30;
     int punchesRepeat = 1;
 
-    Region attackRegion;
+    Region attackRegion, attackRegionBack, attackRegionForward;
+    Region defenseRegion, defenseRegionBack;
     Region specialBar;
     Region specialButton;
     Region pauseRegion;
 
+    TimedActions timedActions;
+
     double similarity = 0.95;
     String localExtraPath = "";
 
-    public FightBot(Region r, Region attackRegion, Region tinyUpTop, double defaultSimilarity, String localExtraPath){
+    Properties prop = null;
+
+    public FightBot(Region r, Region attackRegion, Region tinyUpTop, double defaultSimilarity, String localExtraPath, Properties prop){
         this.r = r;
         this.attackRegion = attackRegion;
+        this.defenseRegion = new Region((this.r.getX()-this.r.getW()+this.attackRegion.getX()), this.attackRegion.getY(), this.attackRegion.getW(), this.attackRegion.getH());
+        this.defenseRegionBack = new Region(this.defenseRegion.getX()-this.defenseRegion.getW(),this.defenseRegion.getY(),this.defenseRegion.getW(),this.defenseRegion.getH());
+        this.attackRegionBack = new Region(this.attackRegion.getX()-this.attackRegion.getW(),this.attackRegion.getY(),this.attackRegion.getW(),this.attackRegion.getH());
+        this.attackRegionForward = new Region(this.attackRegion.getX()+this.attackRegion.getW(),this.attackRegion.getY(),this.attackRegion.getW(),this.attackRegion.getH());
         this.setEnergyLocation();
         this.pauseRegion = tinyUpTop;
         this.similarity = defaultSimilarity;
         this.localExtraPath = localExtraPath;
+        this.prop = prop;
+        this.timedActions = new TimedActions(new Integer(this.prop.getProperty("timeBetweenActions")));
     }
 
     private void setEnergyLocation(){
@@ -40,7 +55,63 @@ public class FightBot {
     }
 
 
+    private void swipeForward(){
+        try {
+            System.out.println("forward");
+            this.timedActions.waitForAction();
+//            this.r.dragDrop(this.attackRegion, this.attackRegionForward);
+            this.r.hover(this.attackRegion);
+            this.r.mouseDown(Button.LEFT);
+            this.r.hover(this.attackRegionForward);
+            this.timedActions.waitForAction(100);
+            this.r.mouseUp();
+//            this.r.dragDrop(this.r.getCenter(), this.attackRegion);
+        }catch(Exception e){
+            System.out.println("Failed to swipe forward");
+        }
+    }
+
+    private void swipeBackward(){
+        try {
+            System.out.println("backward");
+            this.timedActions.waitForAction();
+//            this.r.dragDrop(this.attackRegion, this.attackRegionBack);
+            this.r.hover(this.defenseRegion);
+            this.r.mouseDown(Button.LEFT);
+            this.r.hover(this.defenseRegionBack);
+            this.timedActions.waitForAction(100);
+            this.r.mouseUp();
+        }catch(Exception e){
+            System.out.println("Failed to swipe backward");
+        }
+    }
+
+    private void attack(){
+        try {
+            System.out.println("attack");
+            this.timedActions.waitForAction();
+            Utils.click(this.attackRegion);
+        }catch(Exception e){
+            System.out.println("Failed to attack");
+        }
+    }
+
+    private void defend(){
+        try {
+            System.out.println("defend");
+            this.timedActions.waitForAction();
+            this.r.hover(this.defenseRegion);
+            this.r.mouseDown(Button.LEFT);
+            this.timedActions.waitForAction(100);
+            this.r.mouseUp();
+        }catch(Exception e){
+            System.out.println("Failed to attack");
+        }
+    }
+
     public void fight() throws FindFailed {
+        //set fightspeed
+        Settings.MoveMouseDelay = new Float(this.prop.getProperty("mouseSpeedFight"));
         int counter = 0;
         boolean specialActive = false;
         Utils.setImagesPath(this.localExtraPath,"/fight");
@@ -48,25 +119,37 @@ public class FightBot {
         System.out.println("Looking for a fight...");
         while(true){
             if(Utils.find(this.pauseRegion, "pause")!=null) {
-                System.out.println("Throwing some punches!");
+                this.swipeForward();
+                this.attack();
+                this.attack();
+                this.attack();
+                this.swipeForward();
                 //swipe forward
 //                this.r.dragDrop(this.r.getCenter(),this.attackRegion);
                 //attack and...
-                for (int i = 0; i < 10; i++) {
-                    Utils.click(attackRegion);
-                }//if special available, use it
-                if(specialActive)
+
+//                for (int i = 0; i < 10; i++) {
+//                    Utils.click(attackRegion);
+//                }//if special available, use it
+                if(specialActive) {
                     Utils.click(this.specialButton);
+                }
                 else {
                     counter++;
                     if(counter >= punchesRepeat)
                         if(Utils.findWithSimilarity(this.specialBar, "specialRed", 0.75, this.similarity) != null)
                             specialActive = true;
                 }
+                this.swipeBackward();
+//                this.defend();
                 //and then swipe back swipes are too slow....
 //                this.r.dragDrop(this.attackRegion,this.r.getCenter());
-            }else
+            }else {
+                Settings.MoveMouseDelay = new Float(this.prop.getProperty("mouseSpeed"));   //shouldn't need this...
                 break;
+            }
         }
+        //set speed back to normal
+        Settings.MoveMouseDelay = new Float(this.prop.getProperty("mouseSpeed"));
     }
 }
