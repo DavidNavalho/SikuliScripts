@@ -19,7 +19,7 @@ public class FightBot {
     Region specialButton;
     Region pauseRegion;
 
-    TimedActions timedActions;
+    TimedAction timedActions;
 
     double similarity = 0.95;
     String localExtraPath = "";
@@ -38,7 +38,7 @@ public class FightBot {
         this.similarity = defaultSimilarity;
         this.localExtraPath = localExtraPath;
         this.prop = prop;
-        this.timedActions = new TimedActions(new Integer(this.prop.getProperty("timeBetweenActions")));
+        this.timedActions = new TimedAction(new Integer(this.prop.getProperty("timeBetweenActions")));
     }
 
     private void setEnergyLocation(){
