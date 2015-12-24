@@ -38,8 +38,10 @@ public class MCoC {
         this.s = new Screen();
         this.local = "/"+this.getStringProperty("picsFolder");//localExtraPath;
         this.similarity = this.getDoubleProperty("similarity");
+        Settings.ActionLogs = false;
         Settings.MinSimilarity = this.similarity;
         Settings.AutoWaitTimeout = this.getIntProperty("autoWaitTimeout");//TODO: default waittimeout is 3, changed it to 1! what about 0?
+        Settings.MoveMouseDelay = new Float(this.prop.getProperty("mouseSpeed"));
         this.first = this.getIntProperty("firstArena");
         this.second = this.getIntProperty("secondArena");
         this.setCatalystClash(this.getIntProperty("catalystClashArena"));
@@ -117,7 +119,7 @@ public class MCoC {
         int x = centerX + (this.r.getW()/4);
         int centerY = this.r.getCenter().y;
         this.fightRegion = new Region(x, centerY,50,50);
-        this.bot = new FightBot(this.r, fightRegion, this.topMiddle, this.similarity,this.local);
+        this.bot = new FightBot(this.r, fightRegion, this.topMiddle, this.similarity,this.local, this.prop);
     }//TODO: randomly vary amount of hits during fight;
 //TODO: the continue REALLY needs to be on the small enclosed box, i think....
 
@@ -235,23 +237,23 @@ public class MCoC {
 //                    this.r.dragDrop(m, newLocation);
                     this.s.hover(m);
                     this.s.mouseDown(Button.LEFT);
-                    Utils.sleep(1);
+                    Utils.sleepMilis(100);
                     this.s.hover(m.offset(-1,0));
-                    Utils.sleep(1);
+                    Utils.sleepMilis(100);
 //                    this.s.hover(new Location(m.getX() - 100, m.getY()));
 //                    Utils.sleep(1);
                     this.s.hover(new Location(m.getX() - (this.r.getW()/40), m.getY()));
-                    Utils.sleep(1);
+                    Utils.sleepMilis(100);
                     this.s.hover(new Location(m.getX() - (this.r.getW()/40)*2, m.getY()));
-                    Utils.sleep(1);
+                    Utils.sleepMilis(100);
                     this.s.hover(new Location(m.getX() - (this.r.getW()/40)*3, m.getY()));
-                    Utils.sleep(1);
+                    Utils.sleepMilis(100);
                     this.s.hover(new Location(m.getX() - (this.r.getW()/40)*4, m.getY()));
-                    Utils.sleep(1);
+                    Utils.sleepMilis(100);
                     this.s.hover(new Location(m.getX() - (this.r.getW()/40)*5, m.getY()));
-                    Utils.sleep(1);
+                    Utils.sleepMilis(100);
                     this.s.mouseUp();
-                    Utils.sleep(2);
+                    Utils.sleepMilis(200);
                 }catch(FindFailed ff){
                     System.out.println("Did not find Arena to slide.");
                 }catch(NullPointerException np){
@@ -360,7 +362,8 @@ public class MCoC {
         //seriesMatchScreen
         Utils.clickIfAvailable(this.lowerRight, "accept");
 //        Utils.highlightRegion(this.tinyLowerRight);
-        Utils.clickIfAvailable(this.lowerRight, "continue");
+        if(Utils.isAvailable(this.r,"multiverseArenas",0)==null)
+            Utils.clickIfAvailable(this.lowerRight, "continue");
         //fightStuff
         this.attemptFight("/control");
         //statsKO, victory

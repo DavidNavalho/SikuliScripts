@@ -63,6 +63,14 @@ public class Utils {
         }
     }
 
+    public static void sleepMilis(long waitTime){
+        try {
+            Thread.sleep(waitTime);
+        } catch (InterruptedException e) {
+            //do nothing
+        }
+    }
+
     public static void sleep(int waitTime){
         try {
             Thread.sleep(waitTime*1000);
