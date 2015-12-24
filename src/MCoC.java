@@ -227,47 +227,62 @@ public class MCoC {
 
     //TODO: handle error of not finding catalyst area (e.g. when i manually 'help' it find it....(NullPointerException)
     private void enterCatalystArena(){
-        //repeat up to 3 times
-        for(int i=0;i<15;i++) {//TODO: problems with catalyst arena not found and null pointers...
-            if(Utils.find(this.r, "catalystClashArena")==null) {//then it didn't find it, and should 'look' for it'
-                Match m = Utils.find(this.r, "arenaInfo");
-                try {
-//                    Location newLocation = new Location(m.getX() - this.r.getW()/4, m.getY());
-//                    this.r.dragDrop(m, newReg);
-//                    this.r.dragDrop(m, newLocation);
-                    this.s.hover(m);
-                    this.s.mouseDown(Button.LEFT);
-                    Utils.sleepMilis(100);
-                    this.s.hover(m.offset(-1,0));
-                    Utils.sleepMilis(100);
-//                    this.s.hover(new Location(m.getX() - 100, m.getY()));
-//                    Utils.sleep(1);
-                    this.s.hover(new Location(m.getX() - (this.r.getW()/40), m.getY()));
-                    Utils.sleepMilis(100);
-                    this.s.hover(new Location(m.getX() - (this.r.getW()/40)*2, m.getY()));
-                    Utils.sleepMilis(100);
-                    this.s.hover(new Location(m.getX() - (this.r.getW()/40)*3, m.getY()));
-                    Utils.sleepMilis(100);
-                    this.s.hover(new Location(m.getX() - (this.r.getW()/40)*4, m.getY()));
-                    Utils.sleepMilis(100);
-                    this.s.hover(new Location(m.getX() - (this.r.getW()/40)*5, m.getY()));
-                    Utils.sleepMilis(100);
-                    this.s.mouseUp();
-                    Utils.sleepMilis(200);
-                }catch(FindFailed ff){
-                    System.out.println("Did not find Arena to slide.");
-                }catch(NullPointerException np){
-                    System.out.println("failed at finding something, skipping and retrying...");
-                    this.s.mouseUp();
+        try {
+            //repeat up to 3 times
+            for (int i = 0; i < 7; i++) {//TODO: problems with catalyst arena not found and null pointers...
+                if (Utils.find(this.r, "catalystClashArena") == null) {//then it didn't find it, and should 'look' for it'
+                    Match m = Utils.find(this.r, "arenaInfo");
+                    try {
+                        //                    Location newLocation = new Location(m.getX() - this.r.getW()/4, m.getY());
+                        //                    this.r.dragDrop(m, newReg);
+                        //                    this.r.dragDrop(m, newLocation);
+                        this.s.hover(m);
+                        this.s.mouseDown(Button.LEFT);
+                        Utils.sleepMilis(100);
+                        this.s.hover(m.offset(-1, 0));
+                        Utils.sleepMilis(100);
+                        //                    this.s.hover(new Location(m.getX() - 100, m.getY()));
+                        //                    Utils.sleep(1);
+                        this.s.hover(new Location(m.getX() - (this.r.getW() / 40), m.getY()));
+                        Utils.sleepMilis(100);
+                        this.s.hover(new Location(m.getX() - (this.r.getW() / 40) * 2, m.getY()));
+                        Utils.sleepMilis(100);
+                        this.s.hover(new Location(m.getX() - (this.r.getW() / 40) * 3, m.getY()));
+                        Utils.sleepMilis(100);
+                        this.s.hover(new Location(m.getX() - (this.r.getW() / 40) * 4, m.getY()));
+                        Utils.sleepMilis(100);
+                        this.s.hover(new Location(m.getX() - (this.r.getW() / 40) * 5, m.getY()));
+                        Utils.sleepMilis(100);
+                        this.s.mouseUp();
+                        Utils.sleepMilis(200);
+                    } catch (FindFailed ff) {
+                        this.s.mouseUp();
+                        Utils.sleepMilis(200);
+                        System.out.println("Did not find Arena to slide.");
+                    } catch (NullPointerException np) {
+                        System.out.println("failed at finding something, skipping and retrying...");
+                        this.s.mouseUp();
+                        Utils.sleepMilis(200);
+                    }
                 }
             }
-        }
-        Match match = null;
-        if((match = Utils.find(this.r, "catalystClashArena"))!=null){//then it found it and should enter it!
-            Region arena = new Region(match.getX(), match.getY()+this.r.getH()/2,match.getW(),match.getH()/4);
-            Utils.click(arena);
-        }else {//TODO:otherwise just 'enter' a random one???
-            System.out.println("Failed to Find CatalystArena...");
+            this.s.mouseUp();
+            Utils.sleepMilis(200);
+            Match match = null;
+            if ((match = Utils.find(this.r, "catalystClashArena")) != null) {//then it found it and should enter it!
+//                Region arena = new Region(match.getX(), match.getY() + this.r.getH() / 2, match.getW(), match.getH() / 4);
+                Region arena = new Region(match.getX(), match.getY()+this.r.getH()/2, match.getW(), match.getH());
+                Utils.click(arena);
+            } else {//TODO:otherwise just 'enter' a random one???
+                System.out.println("Failed to Find CatalystArena...");
+                Utils.clickIfAvailable(this.r, "backButton");
+            }
+        }catch(Exception e){
+            this.s.mouseUp();
+            Utils.sleepMilis(200);
+            System.out.println("Some error found related with catalyst arena...");
+            e.printStackTrace();
+            Utils.clickIfAvailable(this.r, "backButton");
         }
     }
 
@@ -336,6 +351,7 @@ public class MCoC {
         Utils.clickIfAvailable(this.r, "mainMenuFight");
         //Play Versus
         Utils.clickIfAvailable(this.r, "playVersus");
+        Utils.clickIfAvailable(this.r, "playVersus2");
         this.attemptFight("/control");
         //handle clicking on champ by mistake
         this.ifExistsClick("info", "cross");
@@ -467,6 +483,8 @@ public class MCoC {
         }
     }
 
+
+    //Clash End: Wed 23Dec, 23:00
 
     //Catalyst start: Sun, 15Nov, 23:00
     //TODO: better method of identifying catalystClash appearance, even if by date?
