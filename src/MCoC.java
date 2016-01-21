@@ -229,32 +229,40 @@ public class MCoC {
     private void enterCatalystArena(){
         try {
             //repeat up to 3 times
-            for (int i = 0; i < 7; i++) {//TODO: problems with catalyst arena not found and null pointers...
+            for (int i = 0; i < 35; i++) {//TODO: problems with catalyst arena not found and null pointers...
                 if (Utils.find(this.r, "catalystClashArena") == null) {//then it didn't find it, and should 'look' for it'
                     Match m = Utils.find(this.r, "arenaInfo");
                     try {
                         //                    Location newLocation = new Location(m.getX() - this.r.getW()/4, m.getY());
                         //                    this.r.dragDrop(m, newReg);
                         //                    this.r.dragDrop(m, newLocation);
-                        this.s.hover(m);
+                        this.s.hover(m.getTopRight());
                         this.s.mouseDown(Button.LEFT);
-                        Utils.sleepMilis(100);
-                        this.s.hover(m.offset(-1, 0));
-                        Utils.sleepMilis(100);
-                        //                    this.s.hover(new Location(m.getX() - 100, m.getY()));
-                        //                    Utils.sleep(1);
-                        this.s.hover(new Location(m.getX() - (this.r.getW() / 40), m.getY()));
-                        Utils.sleepMilis(100);
-                        this.s.hover(new Location(m.getX() - (this.r.getW() / 40) * 2, m.getY()));
-                        Utils.sleepMilis(100);
-                        this.s.hover(new Location(m.getX() - (this.r.getW() / 40) * 3, m.getY()));
-                        Utils.sleepMilis(100);
-                        this.s.hover(new Location(m.getX() - (this.r.getW() / 40) * 4, m.getY()));
-                        Utils.sleepMilis(100);
-                        this.s.hover(new Location(m.getX() - (this.r.getW() / 40) * 5, m.getY()));
-                        Utils.sleepMilis(100);
+                        Utils.sleepMilis(50);
+//                        this.s.hover(m.offset(-1, 0));
+//                        Utils.sleepMilis(100);
+//                                            this.s.hover(new Location(m.getX() - 100, m.getY()));
+//                                            Utils.sleep(1);
+//                        this.s.hover(new Location(m.getTopRight().getX() - (this.r.getW() / 320), m.getY()));
+//                        Utils.sleepMilis(100);
+//                        this.s.hover(new Location(m.getTopRight().getX() - (this.r.getW() / 160), m.getY()));
+//                        Utils.sleepMilis(100);
+//                        this.s.hover(new Location(m.getTopRight().getX() - (this.r.getW() / 80), m.getY()));
+//                        Utils.sleepMilis(50);
+//                        this.s.hover(new Location(m.getTopRight().getX() - (this.r.getW() / 80) * 2, m.getY()));
+//                        Utils.sleepMilis(50);
+                        this.s.hover(new Location(m.getTopRight().getX() - (this.r.getW() / 80) * 3, m.getY()));
+                        Utils.sleepMilis(50);
+                        this.s.hover(new Location(m.getTopRight().getX() - (this.r.getW() / 80) * 4, m.getY()));
+                        Utils.sleepMilis(50);
+                        this.s.hover(new Location(m.getTopRight().getX() - (this.r.getW() / 80) * 5, m.getY()));
+                        Utils.sleepMilis(50);
+                        this.s.hover(new Location(m.getTopRight().getX() - (this.r.getW() / 80) * 6, m.getY()));
+                        Utils.sleepMilis(50);
+                        this.s.hover(new Location(m.getTopRight().getX() - (this.r.getW() / 80) * 7, m.getY()));
+                        Utils.sleepMilis(50);
                         this.s.mouseUp();
-                        Utils.sleepMilis(200);
+                        Utils.sleepMilis(100);
                     } catch (FindFailed ff) {
                         this.s.mouseUp();
                         Utils.sleepMilis(200);
