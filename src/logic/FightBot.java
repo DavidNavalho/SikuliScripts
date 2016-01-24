@@ -57,7 +57,7 @@ public class FightBot {
 
     private void swipeForward(){
         try {
-            System.out.println("forward");
+//            System.out.println("forward");
             this.timedActions.waitForAction();
 //            this.r.dragDrop(this.attackRegion, this.attackRegionForward);
             this.r.hover(this.attackRegion);
@@ -73,7 +73,7 @@ public class FightBot {
 
     private void swipeBackward(){
         try {
-            System.out.println("backward");
+//            System.out.println("backward");
             this.timedActions.waitForAction();
 //            this.r.dragDrop(this.attackRegion, this.attackRegionBack);
             this.r.hover(this.defenseRegion);
@@ -88,7 +88,7 @@ public class FightBot {
 
     private void attack(){
         try {
-            System.out.println("attack");
+//            System.out.println("attack");
             this.timedActions.waitForAction();
             Utils.click(this.attackRegion);
         }catch(Exception e){
@@ -98,7 +98,7 @@ public class FightBot {
 
     private void defend(){
         try {
-            System.out.println("defend");
+//            System.out.println("defend");
             this.timedActions.waitForAction();
             this.r.hover(this.defenseRegion);
             this.r.mouseDown(Button.LEFT);
@@ -116,7 +116,7 @@ public class FightBot {
         boolean specialActive = false;
         Utils.setImagesPath(this.localExtraPath,"/fight");
 //        this.r.wait("fightPause", 3);
-        System.out.println("Looking for a fight...");
+//        System.out.println("Looking for a fight...");
         while(true){
             if(Utils.find(this.pauseRegion, "pause")!=null) {
                 this.swipeForward();

@@ -3,14 +3,16 @@ package logic;
 import org.sikuli.basics.Settings;
 import org.sikuli.script.*;
 
+import javax.swing.*;
 import java.io.File;
+import java.util.Properties;
 
 public class Utils {
 
     public static void setImagesPath(String local, String path){
         String pathImgDefault = new File(System.getProperty("user.dir"), "imgs"+"/"+local+path).getAbsolutePath();
         ImagePath.setBundlePath(pathImgDefault);
-        System.out.println("Image paths: " + ImagePath.getPaths());
+//        System.out.println("Image paths: " + ImagePath.getPaths());
     }
 
     public static void highlightRegion(Region r){
@@ -21,7 +23,7 @@ public class Utils {
         try {
             return r.wait(imagePath, waitTime);
         }catch(FindFailed e){
-            System.out.println("Searched for "+imagePath+", did not find it.");
+//            System.out.println("Searched for "+imagePath+", did not find it.");
             return null;
         }
     }
@@ -44,7 +46,7 @@ public class Utils {
         try{
             return r.find(imagePath);
         }catch(FindFailed e){
-            System.out.println("Searched for "+imagePath+", did not find it.");
+//            System.out.println("Searched for "+imagePath+", did not find it.");
             return null;
         }
     }
@@ -57,7 +59,7 @@ public class Utils {
             Settings.MinSimilarity = previousSimilarity;
             return m;
         }catch(FindFailed e){
-            System.out.println("Searched for "+imagePath+", did not find it.");
+//            System.out.println("Searched for "+imagePath+", did not find it.");
             Settings.MinSimilarity = previousSimilarity;
             return null;
         }
@@ -84,22 +86,23 @@ public class Utils {
 //            Settings.MinSimilarity = 0.30;
             r.click(option1);
         }catch(FindFailed ff){
-            System.out.println(option1+" not available, trying "+option2+".");
+//            System.out.println(option1+" not available, trying "+option2+".");
             try {
                 r.click(option2);
             }catch(FindFailed ff2){
-                System.out.println(option2+" not available.");
+//                System.out.println(option2+" not available.");
             }
         }
 //        Settings.MinSimilarity = similarity;
     }
 
-    public static void clickIfAvailable(Region r, String image){
+    public static boolean clickIfAvailable(Region r, String image){
         try {
             r.click(image);
-//            Utils.click(r, image);
+            return true;
         }catch(FindFailed ff){
-            System.out.println(image+" not available, skipping.");
+            //System.out.println(image+" not available, skipping.");
+            return false;
         }
     }
 
@@ -115,7 +118,20 @@ public class Utils {
         try{
             r.find(image).highlight();
         }catch(FindFailed ff){
-            System.out.println("Failed to find/highlight "+image+".");
+//            System.out.println("Failed to find/highlight "+image+".");
         }
     }
+
+    public static String getStringProperty(Properties prop, String key){
+        return prop.getProperty(key);
+    }
+
+    public static int getIntProperty(Properties prop, String key){
+        return new Integer(prop.getProperty(key));
+    }
+
+    public static double getDoubleProperty(Properties prop, String key){
+        return new Double(prop.getProperty(key));
+    }
+
 }

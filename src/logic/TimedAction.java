@@ -16,10 +16,10 @@ public class TimedAction {
         long currentTime = System.currentTimeMillis();
         //
         if(currentTime>=(lastAction+minimumTime)) {
-            System.out.println("Been a long time! go forward!");
+//            System.out.println("Been a long time! go forward!");
             this.lastAction = currentTime;
         }else{
-            System.out.println("Hold yer horses, boy!, Sleep a little: "+((lastAction+minimumTime)-currentTime));
+//            System.out.println("Hold yer horses, boy!, Sleep a little: "+((lastAction+minimumTime)-currentTime));
             Utils.sleepMilis((lastAction+minimumTime)-currentTime);
             this.lastAction = currentTime;
             //
@@ -29,10 +29,10 @@ public class TimedAction {
     public void waitForAction(int waitTime){
         long currentTime = System.currentTimeMillis();
         if(currentTime>=(lastAction+waitTime)) {
-            System.out.println("Been a long time! go forward!");
+//            System.out.println("Been a long time! go forward!");
             this.lastAction = currentTime;
         }else{
-            System.out.println("Hold yer horses, boy!, Sleep a little: "+((lastAction+waitTime)-currentTime));
+//            System.out.println("Hold yer horses, boy!, Sleep a little: "+((lastAction+waitTime)-currentTime));
             Utils.sleepMilis((lastAction+waitTime)-currentTime);
             this.lastAction = currentTime;
         }

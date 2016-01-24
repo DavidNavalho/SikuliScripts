@@ -1,5 +1,6 @@
 package tasks;
 
+import main.MCoC;
 import org.sikuli.basics.HotkeyEvent;
 import org.sikuli.basics.HotkeyListener;
 import org.sikuli.basics.HotkeyManager;
@@ -12,8 +13,10 @@ import org.sikuli.script.KeyModifier;
 public class Control extends Thread{
 
     public boolean stop = false;
+    private MCoC bot;
 
-    public Control(){
+    public Control(MCoC bot){
+        this.bot = bot;
     }
 
     public void run(){//Control.start()
@@ -34,8 +37,12 @@ public class Control extends Thread{
             } catch (InterruptedException e) {
                 e.printStackTrace();//Do nothing, just making sure it doesn't spin - does it? spin?
             }
-            if(this.stop)
+            if(this.stop) {
+//                bot.stopExecuting();
+//                break;
+                //TODO: make it work so exiting won't close evrything....having some trouble doing that...
                 System.exit(0);
+            }
         }
     }
 }
