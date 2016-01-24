@@ -22,6 +22,7 @@ public class Screenshot extends JPanel implements ActionListener{
     private String ssLocation;
     private JButton validity;
     private JFileChooser fc;
+    private JLabel ownLabel;
 
     public Screenshot(MCoCFrame father, String description, String exampleLocation, String screenshotLocation){
         super();
@@ -31,6 +32,11 @@ public class Screenshot extends JPanel implements ActionListener{
 
         ImageIcon icon = new ImageIcon(exampleLocation);
         JLabel label = new JLabel(icon);
+//        ImageIcon userIcon = new ImageIcon(System.getProperty("user.dir")+"/resources/other/noImage.png");
+//        Image img = userIcon.getImage();
+//        Image newImg = img.getScaledInstance(40, 40,  java.awt.Image.SCALE_SMOOTH);
+//        userIcon = new ImageIcon(newImg);
+
         this.validity = new JButton("-X-");
         this.validity.setEnabled(false);
 
@@ -47,20 +53,42 @@ public class Screenshot extends JPanel implements ActionListener{
         JLabel descript = new JLabel(description);
         descript.setAlignmentX(Component.RIGHT_ALIGNMENT);
         getSSButton.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        ownLabel = new JLabel(this.getUserIcon());
         this.add(descript);
         this.add(label);
         this.add(validity);
         this.add(getSSButton);
+        this.add(ownLabel);
 
         this.screenshotExists();
     }
 
-    private void screenshotExists(){
+    private ImageIcon getUserIcon(){
+        ImageIcon userIcon;
+        if(screenshotExists()){
+            userIcon = new ImageIcon(this.ssLocation);
+        }else{
+            userIcon = new ImageIcon(System.getProperty("user.dir")+"/resources/other/noImage.png");
+            Image img = userIcon.getImage();
+            Image newImg = img.getScaledInstance(40, 40,  java.awt.Image.SCALE_SMOOTH);
+            userIcon = new ImageIcon(newImg);
+        }
+        return userIcon;
+    }
+
+    private void updateUserIcon(){
+        if(screenshotExists()){
+            this.ownLabel.setIcon(new ImageIcon(this.ssLocation));
+        }
+    }
+
+    private boolean screenshotExists(){
         if((new File(this.ssLocation)).exists()) {
             this.validity.setBackground(Color.green);
             this.validity.setText("-V-");
+            return true;
         }
-
+        return false;
     }
 
     public void actionPerformed(ActionEvent e){
@@ -77,6 +105,9 @@ public class Screenshot extends JPanel implements ActionListener{
                         Path target = new File(this.ssLocation).toPath();
                         Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
                         this.screenshotExists();
+                        this.updateUserIcon();
+                        this.ownLabel.repaint();
+                        this.repaint();
                     } catch (IOException e1) {
                         e1.printStackTrace();
                     }
