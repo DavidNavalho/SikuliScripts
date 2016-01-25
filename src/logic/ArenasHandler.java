@@ -127,6 +127,9 @@ public class ArenasHandler {
         int i = 0;
         System.out.print("Searching for arenas.");
         while(anyArenaActive(arenaList)) {
+            if(i>=4)//way too many iterations, something likely went wrong, just quit!
+                return false;
+            i++;
             System.out.print(".");
             //if some arenas are active, their iterations may all be at zero, so check those
             if(!this.availableIterations(arenaList)) {

@@ -388,6 +388,8 @@ public class MCoC extends Thread{
         this.attemptFight("/control");
         //Main Screen
         Utils.clickIfAvailable(this.r, "mainMenuFight");
+        //Arenas insufficient Funds
+        this.ifExistsClick("insufficientFunds", "cross");
         //Play Versus
         Utils.clickIfAvailable(this.r, "playVersus");
 //        Utils.clickIfAvailable(this.r, "playVersus2");
