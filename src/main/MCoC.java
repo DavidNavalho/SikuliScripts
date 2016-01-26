@@ -12,6 +12,19 @@ import java.util.Properties;
 import java.util.Random;
 
 public class MCoC extends Thread{
+    //TODO: this is the current TODO list:
+    //TODO: make it so the Bot is actually always active, but it blocks/resumes based on the Controller
+    //TODO: Make it so the GUI acknoledges when the bot is running, and pressing play only actually resumes it, instead of launching more bots and causing havoc
+    //TODO: make it so properties are automatically reloaded, somehow.
+    //TODO: Introduce properties to the GUI, a simple table allowing a user to change all values
+    //TODO: Make it so the app checks the existing properties file, and adds whatever new elements are required. Create new file if need
+    //TODO: make it so a user can check if the window is being properly detected
+    //TODO: make it so a user can provide coordinates to manually create a window (this willallow other emulators, but won't provide the focus method)
+    //TODO: improve bot fighting
+    //TODO: introduce gui-based bot fighting for tweaking the bot fighting
+    //TODO: Improve Screenshots by making it clearer which is the user's SS, and the required one. Also make them smaller!
+    //TODO: Provide methods to check and alter how arenas are being ran. Some live timers regarding sleep and milestones would also be nice!
+
     public boolean execute = true;
 
     public Region r;
@@ -297,29 +310,29 @@ public class MCoC extends Thread{
     }
 
     //TODO: handle error of not finding catalyst area (e.g. when i manually 'help' it find it....(NullPointerException)
-    private void enterCatalystArena(){
-        try {
-            for (int i = 0; i < 35; i++)  //TODO: 35 should be on the configure file
-                if (Utils.find(this.r, "catalystClashBasicArena") == null) //then it didn't find it, and should 'look' for it'
-                    if(!this.moveScreen(Utils.find(this.r, "arenaInfo")))
-                        Utils.clickIfAvailable(this.r, "backButton");
-
-            Match match = null;
-            if ((match = Utils.find(this.r, "catalystClashBasicArena")) != null) {//then it found it and should enter it!
-                Region arena = new Region(match.getX(), match.getY()+this.r.getH()/2, match.getW(), match.getH());
-                Utils.click(arena);
-            } else {//TODO:otherwise go back and try whatever comes next
-                System.out.println("Failed to Find CatalystArena, going back...");
-                Utils.clickIfAvailable(this.r, "backButton");
-            }
-        }catch(Exception e){
-            this.s.mouseUp();
-            Utils.sleepMilis(200);
-            System.out.println("Some error found related with catalyst arena...");
-            e.printStackTrace();
-            Utils.clickIfAvailable(this.r, "backButton");
-        }
-    }
+//    private void enterCatalystArena(){
+//        try {
+//            for (int i = 0; i < 35; i++)  //TODO: 35 should be on the configure file
+//                if (Utils.find(this.r, "catalystClashBasicArena") == null) //then it didn't find it, and should 'look' for it'
+//                    if(!this.moveScreen(Utils.find(this.r, "arenaInfo")))
+//                        Utils.clickIfAvailable(this.r, "backButton");
+//
+//            Match match = null;
+//            if ((match = Utils.find(this.r, "catalystClashBasicArena")) != null) {//then it found it and should enter it!
+//                Region arena = new Region(match.getX(), match.getY()+this.r.getH()/2, match.getW(), match.getH());
+//                Utils.click(arena);
+//            } else {//TODO:otherwise go back and try whatever comes next
+//                System.out.println("Failed to Find CatalystArena, going back...");
+//                Utils.clickIfAvailable(this.r, "backButton");
+//            }
+//        }catch(Exception e){
+//            this.s.mouseUp();
+//            Utils.sleepMilis(200);
+//            System.out.println("Some error found related with catalyst arena...");
+//            e.printStackTrace();
+//            Utils.clickIfAvailable(this.r, "backButton");
+//        }
+//    }
 
     //TODO: enter cornucopia based on relative position to cornucopia found image, not a fixed position
     //position may change due to looking for catalystClashBasic

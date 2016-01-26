@@ -141,6 +141,7 @@ public class ArenasHandler {
                 System.out.print("_");
                 if(this.runIfPossible(arena)) {
                     System.out.println();
+                    Utils.sleepMilis(500);//wait a bit before proceeding
                     return true;//it should quit this loop eventually! TODO: make sure it does...
                 }
             }

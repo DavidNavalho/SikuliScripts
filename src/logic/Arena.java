@@ -88,8 +88,9 @@ public class Arena {
 
     //this is also based on imagearenas, can be overwritten of course
     protected void checkForMilestone(){
+        System.out.println("Checking for milestone...");
         if((this.milestoneLastChecked+this.milestoneCheckSleepTimer)>System.currentTimeMillis()) {
-//            System.out.println("Milestones checked recently, going in...");
+            System.out.println("Milestones checked recently, going in...");
             return;//do nothing
         }
         else {
@@ -105,6 +106,7 @@ public class Arena {
                 Region milestoneRegion = new Region(m.getX(), m.getY(),m.getW()+m.getW(),m.getH());
                 if(milestoneRegion.getBottomRight().getX() < this.screen.getBottomRight().getX()){
                     this.moveScreen(m);
+                    this.moveScreen(m);//move screen twice to make sure it sees the no milestones message
                     if(Utils.find(milestoneRegion, done)!=null) {
                         doneLastMilestone = true;
                     }

@@ -24,13 +24,13 @@ public class ImageArena extends Arena{
 
     //returns false if it couldn't run for any reason. Must make sure to make inactive outside if it returns false!
     public boolean findArena(){
+        Match match = null;
         for(int i=0;i<Utils.getIntProperty(this.props,"maxSearchForArena");i++)
             if(Utils.find(this.screen, arena)==null)
                 if(!this.moveScreen(Utils.find(this.screen, "arenaInfo"))) {
-                    Utils.clickIfAvailable(this.screen, "backButton");
+                    Utils.clickIfAvailable(this.screen, "backButton");  //TODO:may have just missed it; try the next step
                     return false;
                 }
-        Match match = null;
         if((match = Utils.find(this.screen, arena))!=null) {//found the arena, should click it, count it, return true
             //first, check for milestone existence
             this.checkForMilestone();
@@ -59,6 +59,7 @@ public class ImageArena extends Arena{
         if(this.doneCounter>=this.iterations) {
             return false;
         }
+        doneCounter++;
         Match m = Utils.find(this.screen, arena);
         if(m==null) {
             if (arena.equalsIgnoreCase("crystalCornucopia"))  //TODO: shouldn't need to do this...

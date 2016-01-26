@@ -46,6 +46,7 @@ public class ScreenPositionArena extends Arena {
     public boolean runArena(){
         if(this.doneCounter>=this.iterations)
             return false;
+        doneCounter++;
         Match m = Utils.find(this.screen, "crystalCornucopia");//if cornucopia is available, return false, otherwise run the screen arenas
         if(m==null) {
             Utils.click(this.getArenaRegion(arena));//clicked the arena, so remove an iteration
