@@ -103,10 +103,11 @@ public class Arena {
         else{
             for(int i=0;i<Utils.getIntProperty(this.props,"maxSearchForMilestones");i++){
                 Match m = Utils.find(this.screen, arena);
-                Region milestoneRegion = new Region(m.getX(), m.getY(),m.getW()+m.getW(),m.getH());
+                Region milestoneRegion = new Region(m.getX(), m.getY(),this.screen.getW()-m.getX()+this.screen.getX(),m.getH());
                 if(milestoneRegion.getBottomRight().getX() < this.screen.getBottomRight().getX()){
                     this.moveScreen(m);
                     this.moveScreen(m);//move screen twice to make sure it sees the no milestones message
+                    Utils.sleepMilis(500);
                     if(Utils.find(milestoneRegion, done)!=null) {
                         doneLastMilestone = true;
                     }
@@ -146,5 +147,10 @@ public class Arena {
 //            return true;
 //        }
         return false;
+    }
+
+    @Override
+    public String toString() {
+        return this.arena;
     }
 }

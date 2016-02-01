@@ -34,7 +34,7 @@ public class MCoCFrame extends JFrame {
         this.topPanel = new MCoCPanel(this);
 //        this.centerPanel = new ScrollableScreenshotsSetup(this,"fight");
         this.ssControl = new ScrollableScreenshotsSetup(this, "control");
-        this.ssFight = new ScrollableScreenshotsSetup(this,"fight");
+        this.ssFight = new ScrollableScreenshotsSetup(this, "fight");
         this.centerPanel = new JTabbedPane();
         this.centerPanel.addTab("Control".toUpperCase(), ssControl);
         this.centerPanel.addTab("Fight".toUpperCase(), ssFight);

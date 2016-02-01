@@ -106,6 +106,7 @@ public class MCoC extends Thread{
     private Control ctl;
 
     private void loadProperties(){
+        new PropertiesManager();
         this.prop = new Properties();
         InputStream input = null;
         try{
@@ -388,7 +389,7 @@ public class MCoC extends Thread{
     }
 
     private void uncommonOperations(){
-        Utils.setImagesPath(this.local,"/control");
+        Utils.setImagesPath(this.local, "/control");
         //Reconnect menu TODO: make it sleep for at least some minutes before reconnecting
         Match m = Utils.find(this.middleColumn, "reconnect");
         if(m!=null) {
@@ -420,7 +421,7 @@ public class MCoC extends Thread{
 
     //TODO: when adding files, button doesnt change to green!
     private void commonOperations(){
-        Utils.setImagesPath(this.local,"/control");
+        Utils.setImagesPath(this.local, "/control");
         //Check for Arenas, enter one:
         Match match = Utils.find(this.topMiddle, "multiverseArenas");
         if (match != null)
@@ -468,7 +469,7 @@ public class MCoC extends Thread{
 
     //TODO: this is currently optimized for the Macbook screen...
     public void controller(){
-        Utils.setImagesPath(this.local,"/control");
+        Utils.setImagesPath(this.local, "/control");
         uncommonOperations();
         rareOperations();
 
@@ -506,13 +507,20 @@ public class MCoC extends Thread{
 
     public void tests(){
         try {
+
+            PropertiesManager pm = new PropertiesManager();
+
 //            Utils.setImagesPath("/fight");
-            Utils.setImagesPath(this.local,"/control");
-//            this.enterCatalystArena();
-            Match m = Utils.find(this.r, "catalystClashBasicArena");
-            Utils.highlightRegion(m);
-            Region newReg = new Region(m.getX(), m.getY(),m.getW()+m.getW(),m.getH());
-            Utils.highlightRegion(newReg);
+//            Utils.setImagesPath(this.local,"/control");
+////            this.enterCatalystArena();
+////            Match m = Utils.find(this.r, "catalystClashBasicArena");
+////            Utils.highlightRegion(m);
+////            Region newReg = new Region(m.getX(), m.getY(),m.getW()+m.getW(),m.getH());
+//            Match m = Utils.find(this.r, "catalystClashClassArena");
+//            Region milestoneRegion = new Region(m.getX(), m.getY(),this.r.getW()-m.getX()+this.r.getX(),m.getH());
+//            Utils.highlightRegion(milestoneRegion);
+//            Match m2 = Utils.find(milestoneRegion, "noRewards");
+//            Utils.highlightRegion(m2);
 //            Region test = new Region(this.r.getX(), this.r.getY(),this.r.getBottomRight().getX(), this.r.getBottomRight().getY());
 //            Region newReg = new Region(m.getX(), m.getY(),m.getW()*2+m.getH(),m.getW()*2);
 //            if(this.detectIfArenaDone( "catalystClashBasicArena"))
@@ -530,10 +538,10 @@ public class MCoC extends Thread{
     public static void main(String[] args) {
 //        main.MCoC battler = new main.MCoC("macbook_screen", firstCounter, secondCounter, 0.90, "macbook");
         MCoC battler = new MCoC();
-//          battler.tests();
-        while(true) {
-            battler.controller();
-        }
+          battler.tests();
+//        while(true) {
+//            battler.controller();
+//        }
     }
 
     public void run(){

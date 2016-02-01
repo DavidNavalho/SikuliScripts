@@ -2,16 +2,19 @@ package gui.Layout.Panels;
 
 import gui.MCoCFrame;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
+import java.io.InputStream;
+import java.net.URI;
+import java.nio.file.*;
+import java.util.Collections;
+import java.util.Iterator;
 
 /**
  * Created by davidnavalho on 21/01/16.
@@ -30,7 +33,29 @@ public class Screenshot extends JPanel implements ActionListener{
         this.ssLocation = screenshotLocation;
         this.setLayout(new FlowLayout());
 
-        ImageIcon icon = new ImageIcon(exampleLocation);
+        InputStream in;
+
+//        String className = this.getClass().getName().replace('.', '/');
+//        String classJar = this.getClass().getResource("/" + className + ".class").toString();
+//        if (classJar.startsWith("jar:")) {
+//            System.out.println("*** running from jar: "+exampleLocation);
+//            in = getClass().getResourceAsStream("/images/control/accept.png");
+//        }else
+        in = this.getClass().getResourceAsStream(exampleLocation);
+
+        BufferedImage bi = null;
+        try{
+            bi = ImageIO.read(in);
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+        ImageIcon icon = new ImageIcon(bi);
+
+
+
+
+//        ImageIcon icon = new ImageIcon(this.getClass().getResource(exampleLocation));
+//        ImageIcon icon = new ImageIcon(this.getClass().getResource(exampleLocation));
         JLabel label = new JLabel(icon);
 //        ImageIcon userIcon = new ImageIcon(System.getProperty("user.dir")+"/resources/other/noImage.png");
 //        Image img = userIcon.getImage();
@@ -53,12 +78,22 @@ public class Screenshot extends JPanel implements ActionListener{
         JLabel descript = new JLabel(description);
         descript.setAlignmentX(Component.RIGHT_ALIGNMENT);
         getSSButton.setAlignmentX(Component.RIGHT_ALIGNMENT);
-        ownLabel = new JLabel(this.getUserIcon());
+
+        ImageIcon userIcon = this.getUserIcon();
+//        Image img = userIcon.getImage();
+//        BufferedImage bi = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+//        Graphics g = bi.createGraphics();
+//        g.drawImage(img, 0, 0, icon.getIconWidth(), icon.getIconHeight(), null);
+//        bi.flush();
+//        ImageIcon newIcon = new ImageIcon(bi);
+//        ownLabel = new JLabel(newIcon);
+        ownLabel = new JLabel(userIcon);
+//        ownLabel.setPreferredSize(label.getPreferredSize());
         this.add(descript);
         this.add(label);
-        this.add(validity);
-        this.add(getSSButton);
         this.add(ownLabel);
+        this.add(getSSButton);
+        this.add(validity);
 
         this.screenshotExists();
     }
@@ -68,7 +103,7 @@ public class Screenshot extends JPanel implements ActionListener{
         if(screenshotExists()){
             userIcon = new ImageIcon(this.ssLocation);
         }else{
-            userIcon = new ImageIcon(System.getProperty("user.dir")+"/resources/other/noImage.png");
+            userIcon = new ImageIcon(this.getClass().getResource("/images/other/noImage.png"));//System.getProperty("user.dir")+"/resources/images/other/noImage.png");
             Image img = userIcon.getImage();
             Image newImg = img.getScaledInstance(40, 40,  java.awt.Image.SCALE_SMOOTH);
             userIcon = new ImageIcon(newImg);

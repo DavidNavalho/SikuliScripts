@@ -114,7 +114,7 @@ public class FightBot {
         Settings.MoveMouseDelay = new Float(this.prop.getProperty("mouseSpeedFight"));
         int counter = 0;
         boolean specialActive = false;
-        Utils.setImagesPath(this.localExtraPath,"/fight");
+        Utils.setImagesPath(this.localExtraPath, "/fight");
 //        this.r.wait("fightPause", 3);
 //        System.out.println("Looking for a fight...");
         while(true){

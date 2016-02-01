@@ -5,10 +5,7 @@ import gui.MCoCFrame;
 import logic.Utils;
 
 import javax.swing.*;
-import java.awt.*;
 import java.io.File;
-import java.util.Iterator;
-import java.util.LinkedList;
 
 /**
  * Created by davidnavalho on 21/01/16.
@@ -23,7 +20,7 @@ public class FightScreenshots extends JPanel{
         super();
         this.father = father;
         String local = Utils.getStringProperty(this.father.props,"picsFolder");
-        String path = "/fight";
+        String path = "/images/fight";
         this.fightScreenshotsPath = new File(System.getProperty("user.dir"), "imgs"+"/"+local+path).getAbsolutePath();
         this.setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
 

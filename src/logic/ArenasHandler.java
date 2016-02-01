@@ -156,7 +156,7 @@ public class ArenasHandler {
             //check validity (other function) to execute (includes sleep), or provide false if they're all inactive
             //if they're all innactive, go for next priority arenas -> this can happen on a next iteration, and that's ok
         LinkedList<Arena> arenaList = this.getNextPriorityArenas();
-        System.out.println("Found arenas to run with priority: "+arenaList.getFirst().priority+", total: "+arenaList.size()+" ["+arenaList.getFirst().arena+"]");
+        System.out.println("Testing arenas to run with priority: "+arenaList.getFirst().priority+", total: "+arenaList.size()+" ["+arenaList.toString()+"]");
         this.executeArena(arenaList);
     }
 }

@@ -28,6 +28,7 @@ public class ScreenshotsSetup extends JPanel {
         this.father = father;
         String local = Utils.getStringProperty(this.father.props, "picsFolder");
         this.ssPath = "/"+ssPath;
+//        this.screenshotsPath = new File(this.getClass().getResource());
         this.screenshotsPath = new File(System.getProperty("user.dir"), "imgs"+"/"+local+this.ssPath).getAbsolutePath();
         this.setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
 //        this.setLayout(new GridLayout(0,1));
@@ -54,7 +55,8 @@ public class ScreenshotsSetup extends JPanel {
     public void addSSItem(SSItem item){
         String fileName = "/"+item.fileName;
         String description = item.description;
-        Screenshot ss = new Screenshot(this.father, description, System.getProperty("user.dir")+"/resources/"+this.ssPath+fileName,screenshotsPath+fileName);
+        Screenshot ss = new Screenshot(this.father, description, "/images"+ this.ssPath+fileName,screenshotsPath+fileName);
+//        Screenshot ss = new Screenshot(this.father, description, System.getProperty("user.dir")+"/"+this.ssPath+fileName,screenshotsPath+fileName);
 //        ss.setAlignmentX(Component.RIGHT_ALIGNMENT);
 //        ss.setAlignmentX(Component.LEFT_ALIGNMENT);
         this.add(ss);
