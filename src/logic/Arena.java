@@ -98,19 +98,27 @@ public class Arena {
         }
         boolean doneLastMilestone = false;
         if(!this.stopOnMilestone) {
+            System.out.println("No stopping on miletones!");
             return;
         }
         else{
+            System.out.println("Checking for milestone");
             for(int i=0;i<Utils.getIntProperty(this.props,"maxSearchForMilestones");i++){
+                System.out.println("check...");
                 Match m = Utils.find(this.screen, arena);
                 Region milestoneRegion = new Region(m.getX(), m.getY(),this.screen.getW()-m.getX()+this.screen.getX(),m.getH());
                 if(milestoneRegion.getBottomRight().getX() < this.screen.getBottomRight().getX()){
+                    System.out.println("milestone outside of scope");
+                    this.moveScreen(m);
+                    this.moveScreen(m);
                     this.moveScreen(m);
                     this.moveScreen(m);//move screen twice to make sure it sees the no milestones message
                     Utils.sleepMilis(500);
                     if(Utils.find(milestoneRegion, done)!=null) {
+                        System.out.println("milestone found");
                         doneLastMilestone = true;
-                    }
+                    }else
+                        System.out.println("mielstone not found!");
                     break;//else milestones are still available and it should go in!
                 }
                 else

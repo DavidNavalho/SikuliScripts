@@ -90,7 +90,8 @@ public class MCoCFrame extends JFrame {
         this.ssControl.addNewScreenshotItem(new SSItem("later.png", "Later Button"));
         this.ssControl.addNewScreenshotItem(new SSItem("mainMenuFight.png", "Main Menu Fight Button"));
         this.ssControl.addNewScreenshotItem(new SSItem("multiverseArenas.png", "Multiverse Arenas"));
-        this.ssControl.addNewScreenshotItem(new SSItem("playVersus.png", "Play Versus"));
+        this.ssControl.addNewScreenshotItem(new SSItem("playVersus.png", "Play Versus when no AQ is ongoing"));
+        this.ssControl.addNewScreenshotItem(new SSItem("playVersus2.png", "Play Versus when AQ exists"));
         this.ssControl.addNewScreenshotItem(new SSItem("rankRewards.png", "Rank Rewards"));
         this.ssControl.addNewScreenshotItem(new SSItem("recharging.png", "Recharging Icon"));
         this.ssControl.addNewScreenshotItem(new SSItem("reconnect.png", "Reconnect Button"));

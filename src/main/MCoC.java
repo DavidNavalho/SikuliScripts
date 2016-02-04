@@ -406,7 +406,7 @@ public class MCoC extends Thread{
         this.ifExistsClick("insufficientFunds", "cross");
         //Play Versus
         Utils.clickIfAvailable(this.r, "playVersus");
-//        Utils.clickIfAvailable(this.r, "playVersus2");
+        Utils.clickIfAvailable(this.r, "playVersus2");
         this.attemptFight("/control");
         //handle clicking on champ by mistake
         this.ifExistsClick("info", "cross");    //TODO:the hell is this? put this on the Utils!!
@@ -511,13 +511,18 @@ public class MCoC extends Thread{
             PropertiesManager pm = new PropertiesManager();
 
 //            Utils.setImagesPath("/fight");
-//            Utils.setImagesPath(this.local,"/control");
+            Utils.setImagesPath(this.local,"/control");
+            Match m = Utils.find(this.r, "rewards");
+            Utils.highlightRegion(m);
+            Region newReg = new Region(m.getX(), m.getY(), this.r.getBottomRight().getX(), this.r.getBottomRight().getY());
+            Utils.highlightRegion(newReg);
 ////            this.enterCatalystArena();
 ////            Match m = Utils.find(this.r, "catalystClashBasicArena");
 ////            Utils.highlightRegion(m);
 ////            Region newReg = new Region(m.getX(), m.getY(),m.getW()+m.getW(),m.getH());
-//            Match m = Utils.find(this.r, "catalystClashClassArena");
-//            Region milestoneRegion = new Region(m.getX(), m.getY(),this.r.getW()-m.getX()+this.r.getX(),m.getH());
+//            Match m = Utils.find(this.r, "catalystClashAlphaArena");
+//            Utils.highlightRegion(m);
+//            Region milestoneRegion = new Region(m.getTopLeft().getX(), m.getTopLeft().getY(),m.getW()*3,m.getH());
 //            Utils.highlightRegion(milestoneRegion);
 //            Match m2 = Utils.find(milestoneRegion, "noRewards");
 //            Utils.highlightRegion(m2);
