@@ -90,9 +90,9 @@ public class MCoC extends Thread{
         int alpha = Utils.getIntProperty(this.prop, "catalystClashAlphaArena");
         int classs = Utils.getIntProperty(this.prop, "catalystClashClassArena");
         Arena crystalCornucopia = new ImageArena(Utils.getIntProperty(this.prop, "cornucopiaArenaPriority"), cornucopia, "noRewards", this.r, "crystalCornucopia", this.prop, 0, false);
-        Arena catalystClashBasic = new ImageArena(Utils.getIntProperty(this.prop, "catalystClashBasicArenaPriority"), basic, "noRewards", this.r, "catalystClashBasicArena", this.prop, Utils.getIntProperty(this.prop, "arenaDoneSleepTimer"), true);
-        Arena catalystClashAlpha = new ImageArena(Utils.getIntProperty(this.prop, "catalystClashAlphaArenaPriority"), alpha, "noRewards", this.r, "catalystClashAlphaArena", this.prop, Utils.getIntProperty(this.prop, "arenaDoneSleepTimer"), true);
-        Arena catalystClashClass = new ImageArena(Utils.getIntProperty(this.prop, "catalystClashClassArenaPriority"), classs, "noRewards", this.r, "catalystClashClassArena", this.prop, Utils.getIntProperty(this.prop, "arenaDoneSleepTimer"), true);
+        Arena catalystClashBasic = new ImageArena(Utils.getIntProperty(this.prop, "catalystClashBasicArenaPriority"), basic, "noRewards", this.r, "catalystClashBasicArena", this.prop, Utils.getIntProperty(this.prop, "arenaDoneSleepTimer"), false);
+        Arena catalystClashAlpha = new ImageArena(Utils.getIntProperty(this.prop, "catalystClashAlphaArenaPriority"), alpha, "noRewards", this.r, "catalystClashAlphaArena", this.prop, Utils.getIntProperty(this.prop, "arenaDoneSleepTimer"), false);
+        Arena catalystClashClass = new ImageArena(Utils.getIntProperty(this.prop, "catalystClashClassArenaPriority"), classs, "noRewards", this.r, "catalystClashClassArena", this.prop, Utils.getIntProperty(this.prop, "arenaDoneSleepTimer"), false);
         if(cornucopia>0)
             this.arenasHandler.addArena(crystalCornucopia);
         if(basic>0)
@@ -443,11 +443,17 @@ public class MCoC extends Thread{
 
     }
 
-    private void takeCareofRegens(){
+    private boolean takeCareofRegens(){
+        if(Utils.find(this.regenRegion, "recharging")!=null) {
+            Utils.clickIfAvailable(this.r, "backButton");//TODO: make it only look at top left
+            return false;
+        }
         while(Utils.find(this.r, "regenBox")!=null) {
 //            Utils.clickIfAvailable(this.r, "cross");
             Utils.clickIfAvailable(this.r, "regenBox");
+            Utils.sleepMilis(200);
         }
+        return true;
     }
 
     private void fillBoxes(){
@@ -455,11 +461,13 @@ public class MCoC extends Thread{
             Region dragRegion = this.regenRegion;
 
             while (Utils.find(this.thirdBoxRegion, "thirdAvailableSpot") != null) {
-                takeCareofRegens();//needs to be part of the logic here;
+                if(!takeCareofRegens())
+                    return;
                 //TODO: 'fallback' if the first one has that clock icon - means this roster is full, and we should go back and do another arena
                 Utils.clickIfAvailable(this.r, "cross");
-                Utils.sleep(3);
-                takeCareofRegens();
+                Utils.sleepMilis(200);
+                if(!takeCareofRegens())
+                    return;
                 this.r.dragDrop(dragRegion, this.thirdBoxRegion);
             }
         }catch(FindFailed e){
