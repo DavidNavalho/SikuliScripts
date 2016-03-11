@@ -85,6 +85,7 @@ public class ArenasHandler {
     }
 
     //On what does running an arena consist?
+    //arena types: position, image
     //1 - check if it's active based on sleep timer and check if it's not done (so it becomes inactive)
     //2 - if it's active, check if it has remaining iterations
     //3 - if it has remaining iterations, run it, decrement iterator and return true

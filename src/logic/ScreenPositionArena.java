@@ -12,7 +12,7 @@ public class ScreenPositionArena extends Arena {
 
 
     public ScreenPositionArena(int priority, int timesToRun, String done, Region screen, String arena, Properties props, long sleepTimer, boolean stopOnMilestone){
-        super(priority, timesToRun, done, screen,arena, props, sleepTimer, stopOnMilestone);
+        super(priority, timesToRun, done, screen,arena, props, sleepTimer, stopOnMilestone, "position");
     }
 
     private Region getArenaRegion(String arena){
@@ -42,17 +42,17 @@ public class ScreenPositionArena extends Arena {
     //find arena - it's screen-based, and also based on no moves, so assume it's already available?
     //unless it's the cornucopia today!
     //so let's do it backwards, detect if an arena does not exist (cornucopia)
-    @Override
-    public boolean runArena(){
-        if(this.doneCounter>=this.iterations)
-            return false;
-        doneCounter++;
-        Match m = Utils.find(this.screen, "crystalCornucopia");//if cornucopia is available, return false, otherwise run the screen arenas
-        if(m==null) {
-            Utils.click(this.getArenaRegion(arena));//clicked the arena, so remove an iteration
-            return true;
-        }
-        this.doneCounter++;
-        return false;
-    }
+//    @Override
+//    public boolean runArena(){
+//        if(this.doneCounter>=this.iterations)
+//            return false;
+//        doneCounter++;
+//        Match m = Utils.find(this.screen, "crystalCornucopia");//if cornucopia is available, return false, otherwise run the screen arenas
+//        if(m==null) {
+//            Utils.click(this.getArenaRegion(arena));//clicked the arena, so remove an iteration
+//            return true;
+//        }
+//        this.doneCounter++;
+//        return false;
+//    }
 }

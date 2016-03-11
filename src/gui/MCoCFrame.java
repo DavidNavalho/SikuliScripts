@@ -81,7 +81,7 @@ public class MCoCFrame extends JFrame {
         this.ssControl.addNewScreenshotItem(new SSItem("catalystClashBasicArena.png", "T4 BASIC Catalyst Arena"));
         this.ssControl.addNewScreenshotItem(new SSItem("catalystClashClassArena.png", "T4 CLASS Catalyst Arena"));
         this.ssControl.addNewScreenshotItem(new SSItem("accept.png", "Accept"));
-        this.ssControl.addNewScreenshotItem(new SSItem("arenaInfo.png", "Arena Info"));
+        this.ssControl.addNewScreenshotItem(new SSItem("3vs3.png", "3vs3 upper part"));
         this.ssControl.addNewScreenshotItem(new SSItem("backButton.png", "Back Button"));
         this.ssControl.addNewScreenshotItem(new SSItem("continue.png", "Continue Button"));
         this.ssControl.addNewScreenshotItem(new SSItem("cross.png", "Close Window"));

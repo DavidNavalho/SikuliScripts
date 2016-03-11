@@ -36,7 +36,7 @@ public class MCoC extends Thread{
     private double similarity = 0.90;
     private String local = "";
 
-    private Region topMiddle, lowerRight, lowerLeft, regenRegion, thirdBoxRegion, middleColumn, middleLowerColumn;
+    private Region topMiddle, lowerRight, lowerLeft, regenRegion, thirdBoxRegion, middleColumn, middleLowerColumn, leftSide, rightSide;
 
     //TODO: make reconnect a bit more aggressive: the game sometimes goes through multiple reconnects. Make an internal timeout before it gives up pressing reconnect again
     //TODO: remote enable/disable would be awesome! no clue how to do that, though...
@@ -62,6 +62,7 @@ public class MCoC extends Thread{
 //        this.setCatalystClashBasic(this.getIntProperty("catalystClashBasicArena"));
 //        this.setCornucopia(this.getIntProperty("cornucopiaArena"));
         this.r = this.setScreen();
+
 //        Utils.setImagesPath(this.local,"");
         this.setupRegions();
         this.setupFightBot();
@@ -164,6 +165,8 @@ public class MCoC extends Thread{
         this.middleColumn = new Region(X1+quarterWidth, Y1, width/2, height);
         this.middleLowerColumn = new Region(X1+quarterWidth, Y1+height/2, width/2, height/2);
         this.lowerLeft = new Region(X1, Y2-quarterHeight, quarterWidth, quarterHeight);
+        this.leftSide = new Region(X1, Y1, width/2, height);
+        this.rightSide = new Region(X1+width/2, Y1, width/2, height);
 //        Utils.highlightRegion(this.lowerLeft);
     }
 
@@ -517,13 +520,14 @@ public class MCoC extends Thread{
         try {
 
             PropertiesManager pm = new PropertiesManager();
-
+            Utils.highlightRegion(this.leftSide);
+            Utils.highlightRegion(this.rightSide);
 //            Utils.setImagesPath("/fight");
-            Utils.setImagesPath(this.local,"/control");
-            Match m = Utils.find(this.r, "rewards");
-            Utils.highlightRegion(m);
-            Region newReg = new Region(m.getX(), m.getY(), this.r.getBottomRight().getX(), this.r.getBottomRight().getY());
-            Utils.highlightRegion(newReg);
+//            Utils.setImagesPath(this.local,"/control");
+//            Match m = Utils.find(this.r, "rewards");
+//            Utils.highlightRegion(m);
+//            Region newReg = new Region(m.getX(), m.getY(), this.r.getBottomRight().getX(), this.r.getBottomRight().getY());
+//            Utils.highlightRegion(newReg);
 ////            this.enterCatalystArena();
 ////            Match m = Utils.find(this.r, "catalystClashBasicArena");
 ////            Utils.highlightRegion(m);
