@@ -2,6 +2,9 @@ package gui;
 
 import gui.Layout.*;
 import gui.resources.SSItem;
+import logic.PropertiesManager;
+import logic.RebootHandler;
+import main.MCoC;
 
 import javax.swing.*;
 import java.awt.*;
@@ -20,11 +23,19 @@ public class MCoCFrame extends JFrame {
     public Properties props;
     public JTabbedPane centerPanel;
     protected ScrollableScreenshotsSetup ssFight;
+    protected ScrollableScreenshotsSetup ssExtra;
+    protected Experiments exps;
+    protected SettingsTab settings;
+    protected PropertiesManager pm;
+
+    public MCoC bot;
 
     public MCoCFrame(){
         super();
+        this.pm = new PropertiesManager();
         this.loadProperties();
         this.setLayout(new BorderLayout(10,10));
+
 //        this.playPanel = new PlayPanel();
 //        Label label = new Label("Ctrl + S to STOP");
 //        JPanel panel = new JPanel();
@@ -35,9 +46,16 @@ public class MCoCFrame extends JFrame {
 //        this.centerPanel = new ScrollableScreenshotsSetup(this,"fight");
         this.ssControl = new ScrollableScreenshotsSetup(this, "control");
         this.ssFight = new ScrollableScreenshotsSetup(this, "fight");
+        this.ssExtra = new ScrollableScreenshotsSetup(this, "control");
+        this.exps = new Experiments(this, this.props);
+        this.settings = new SettingsTab(this, pm);
         this.centerPanel = new JTabbedPane();
         this.centerPanel.addTab("Control".toUpperCase(), ssControl);
         this.centerPanel.addTab("Fight".toUpperCase(), ssFight);
+        this.centerPanel.addTab("Extra".toUpperCase(), ssExtra);
+        this.centerPanel.addTab("Settings".toUpperCase(), settings);
+        this.centerPanel.addTab("Experiments".toUpperCase(), exps);
+
 //        this.ssControl.setMinimumSize(new Dimension(200,600));
         this.setMinimumSize(new Dimension(800,600));
         this.add(topPanel, BorderLayout.PAGE_START);
@@ -49,29 +67,35 @@ public class MCoCFrame extends JFrame {
         this.setExtendedState(Frame.NORMAL);
         this.addScreenshotItems();
 
+        this.setSize(new Dimension(600, 400));
         this.setVisible(true);
         this.setTitle("Grim's Bot Configuration utility");
 
         this.revalidate();
     }
 
+    public void setBot(MCoC battler){
+        this.bot = battler;
+    }
+
     private void loadProperties(){
-        this.props = new Properties();
-        InputStream input = null;
-        try{
-            input = new FileInputStream("config.properties");
-            this.props.load(input);
-        }catch (IOException ex) {
-            ex.printStackTrace();
-        } finally {
-            if (input != null) {
-                try {
-                    input.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
+        this.props = pm.prop;
+//        this.props = new Properties();
+//        InputStream input = null;
+//        try{
+//            input = new FileInputStream("config.properties");
+//            this.props.load(input);
+//        }catch (IOException ex) {
+//            ex.printStackTrace();
+//        } finally {
+//            if (input != null) {
+//                try {
+//                    input.close();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }
     }
 
     private void addScreenshotItems(){
@@ -109,6 +133,12 @@ public class MCoCFrame extends JFrame {
         //Fight Screenshots
         this.ssFight.addNewScreenshotItem(new SSItem("pause.png", "Pause"));
         this.ssFight.addNewScreenshotItem(new SSItem("specialRed.png","Red Power Bar"));
+
+        //extra functionality
+        this.ssExtra.addNewScreenshotItem(new SSItem("GenyPlayButton.png","Play/Launch button"));
+        this.ssExtra.addNewScreenshotItem(new SSItem("GenyPlayButtonHighlighted.png","Play/Launch button"));
+        this.ssExtra.addNewScreenshotItem(new SSItem("mcocIcon.png","MCoC Shortcut"));
+        this.ssExtra.addNewScreenshotItem(new SSItem("genyVMContinue.png","Geny Continue"));
     }
 
 }

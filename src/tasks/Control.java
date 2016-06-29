@@ -40,8 +40,9 @@ public class Control extends Thread{
             if(this.stop) {
 //                bot.stopExecuting();
 //                break;
-                //TODO: make it work so exiting won't close evrything....having some trouble doing that...
-                System.exit(0);
+//                System.exit(0);
+                this.bot.pauseEnabled = true;
+                this.stop = false;
             }
         }
     }

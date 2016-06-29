@@ -5,9 +5,6 @@ import org.sikuli.basics.Settings;
 import org.sikuli.script.*;
 import tasks.Control;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Properties;
 import java.util.Random;
 
@@ -27,7 +24,7 @@ public class MCoC extends Thread{
 
     public boolean execute = true;
 
-    public Region r;
+    public Region r = null;
     private int X1,X2,Y1,Y2;
     private FightBot bot = null;
     private Region fightRegion = null;
@@ -61,16 +58,14 @@ public class MCoC extends Thread{
 //        this.second = this.getIntProperty("secondArena");
 //        this.setCatalystClashBasic(this.getIntProperty("catalystClashBasicArena"));
 //        this.setCornucopia(this.getIntProperty("cornucopiaArena"));
-        this.r = this.setScreen();
+
 
 //        Utils.setImagesPath(this.local,"");
-        this.setupRegions();
-        this.setupFightBot();
-        this.arenasHandler = new ArenasHandler(this.prop);
-        this.setupArenas();
-        Utils.highlightRegion(this.r); //TODO: make a tester button outside instead
+
+//        Utils.highlightRegion(this.r); //DONE: make a tester button outside instead
         this.ctl = new Control(this);
         ctl.start();
+        this.resetScreen();
     }
 
     private void setupArenas(){
@@ -104,26 +99,27 @@ public class MCoC extends Thread{
             this.arenasHandler.addArena(catalystClashClass);
     }
 
-    private Control ctl;
+    public Control ctl;
 
     private void loadProperties(){
-        new PropertiesManager();
-        this.prop = new Properties();
-        InputStream input = null;
-        try{
-            input = new FileInputStream("config.properties");
-            prop.load(input);
-        }catch (IOException ex) {
-            ex.printStackTrace();
-        } finally {
-            if (input != null) {
-                try {
-                    input.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
+        PropertiesManager pm = new PropertiesManager();
+        this.prop = pm.prop;
+//        this.prop = new Properties();
+//        InputStream input = null;
+//        try{
+//            input = new FileInputStream("config.properties");
+//            prop.load(input);
+//        }catch (IOException ex) {
+//            ex.printStackTrace();
+//        } finally {
+//            if (input != null) {
+//                try {
+//                    input.close();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }
     }
 
     //TODO: change what's used here in terms of properties to using the Utils version
@@ -146,6 +142,8 @@ public class MCoC extends Thread{
 //    public void setCornucopia(int number){
 //        this.cornucopia = number;
 //    }
+
+//
 
     private void setupRegions(){
         int height = this.r.getH();
@@ -175,7 +173,7 @@ public class MCoC extends Thread{
         int x = centerX + (this.r.getW()/4);
         int centerY = this.r.getCenter().y;
         this.fightRegion = new Region(x, centerY,50,50);
-        this.bot = new FightBot(this.r, fightRegion, this.topMiddle, this.similarity,this.local, this.prop);
+        this.bot = new FightBot(this.r, fightRegion, this.topMiddle, this.similarity,this.local, this.prop, this);
     }//TODO: randomly vary amount of hits during fight;
 //TODO: the continue REALLY needs to be on the small enclosed box, i think....
 
@@ -204,20 +202,106 @@ public class MCoC extends Thread{
 //        return new Region(centerX-xEight-xSixteenth, centerY+yQuarter+yEight,50,25);
 //    }
 
-    private Region setScreen(){
-        App app = new App(this.getStringProperty("app"));//"player");
-        int appWindow = this.getIntProperty("appWindow");
-        app.focus(appWindow);//2);
-//        System.out.println("appwindow: "+appWindow);
-//        Utils.highlightRegion(app.window(0));
-//        System.out.println("> Coordinates: "+app.window(2).getX()+","+app.window(2).getY());
-//        System.out.println("> ...to: "+app.window(2).getW()+","+app.window(2).getH());
-        X1 = app.window(appWindow).getX();
-        Y1 = app.window(appWindow).getY();
-        X2 = app.window(appWindow).getW()+X1;
-        Y2 = app.window(appWindow).getH()+Y1;
-        this.s = new Screen();
-        return s.setRect(X1, Y1, X2-X1, Y2-Y1);
+//    App app = new App(this.getStringProperty("app"));//"player");
+//    int chosenWindow = 0;
+//    int windowArea = 0;
+//    System.out.println("Testing windows....");
+//    for(int i=0;i<10;i++){
+//        Region r = app.window(i);
+//        if(r!=null) {
+//            int newArea = app.window(i).getH()*app.window(i).getW();
+//            System.out.println("Window "+i+" is available, with an area of: "+newArea);
+//            if(newArea>windowArea){
+//                chosenWindow = i;
+//                windowArea = newArea;
+//            }
+//        }
+//    }
+//    app.focus(chosenWindow);
+//    X1 = app.window(chosenWindow).getX();
+//    Y1 = app.window(chosenWindow).getY();
+//    X2 = app.window(chosenWindow).getW() + X1;
+//    Y2 = app.window(chosenWindow).getH() + Y1;
+//    new Screen().setRect(X1, Y1, X2 - X1, Y2 - Y1).highlight();
+
+    public int chosenWindow;
+    public App app;
+
+    public void setScreen(boolean forceCheck){
+        while(true) {
+            try {
+                if(this.r == null || forceCheck){
+                    app = new App(this.getStringProperty("app"));//"player");
+    //                int appWindow = this.getIntProperty("appWindow");
+                    chosenWindow = 0;
+                    int windowArea = 0;
+    //                System.out.println("Testing windows....");
+                    for(int i=0;i<10;i++){
+                        Region r = app.window(i);
+                        if(r!=null) {
+                            int newArea = app.window(i).getH()*app.window(i).getW();
+    //                        System.out.println("Window "+i+" is available, with an area of: "+newArea);
+                            if(newArea>windowArea){
+                                chosenWindow = i;
+                                windowArea = newArea;
+                            }
+                        }
+                    }
+                    app.focus(chosenWindow);//2);
+                    //        System.out.println("appwindow: "+appWindow);
+                    //        Utils.highlightRegion(app.window(0));
+                    //        System.out.println("> Coordinates: "+app.window(2).getX()+","+app.window(2).getY());
+                    //        System.out.println("> ...to: "+app.window(2).getW()+","+app.window(2).getH());
+                    X1 = app.window(chosenWindow).getX();
+                    Y1 = app.window(chosenWindow).getY();
+                    X2 = app.window(chosenWindow).getW() + X1;
+                    Y2 = app.window(chosenWindow).getH() + Y1;
+                    this.s = new Screen();
+                    this.r = s.setRect(X1, Y1, X2 - X1, Y2 - Y1);
+                    if(forceCheck){
+                        this.rareOperations();
+                        Utils.sleep(15);
+                        this.rareOperations();
+                        app = new App(this.getStringProperty("app"));//"player");
+                        //                int appWindow = this.getIntProperty("appWindow");
+                        chosenWindow = 0;
+                        windowArea = 0;
+                        //                System.out.println("Testing windows....");
+                        for(int i=0;i<10;i++){
+                            Region r = app.window(i);
+                            if(r!=null) {
+                                int newArea = app.window(i).getH()*app.window(i).getW();
+                                //                        System.out.println("Window "+i+" is available, with an area of: "+newArea);
+                                if(newArea>windowArea){
+                                    chosenWindow = i;
+                                    windowArea = newArea;
+                                }
+                            }
+                        }
+                        app.focus(chosenWindow);//2);
+                        //        System.out.println("appwindow: "+appWindow);
+                        //        Utils.highlightRegion(app.window(0));
+                        //        System.out.println("> Coordinates: "+app.window(2).getX()+","+app.window(2).getY());
+                        //        System.out.println("> ...to: "+app.window(2).getW()+","+app.window(2).getH());
+                        X1 = app.window(chosenWindow).getX();
+                        Y1 = app.window(chosenWindow).getY();
+                        X2 = app.window(chosenWindow).getW() + X1;
+                        Y2 = app.window(chosenWindow).getH() + Y1;
+                        this.s = new Screen();
+                        this.r = s.setRect(X1, Y1, X2 - X1, Y2 - Y1);
+                    }
+                    this.setupRegions();
+                    this.setupFightBot();
+                    this.arenasHandler = new ArenasHandler(this.prop);
+                    this.setupArenas();
+                    return;
+                }else
+                    return;
+            } catch (Exception e) {
+                System.out.println("Did not detect a running VM, sleeping for a couple seconds...");
+                Utils.sleep(10);
+            }
+        }
     }
 
 
@@ -271,9 +355,33 @@ public class MCoC extends Thread{
 //        }
 //    }
 
+    public void resetScreen(){
+        this.setScreen(false);
+    }
+
+    protected int pauseMilis = 1000;
+    public boolean pauseEnabled = false;
+    protected int checkAtAttempt = 100;
+    protected int attemptCounter = 0;
+    public void checkForPauseAndResetScreen(boolean checkScreen){
+        while(pauseEnabled) {
+            System.out.println("pauseEnabled");
+            Utils.sleepMilis(pauseMilis);
+        }
+        if(checkScreen || attemptCounter>= checkAtAttempt) {
+            System.out.println("Running check screen");
+            this.resetScreen();
+            app.focus(chosenWindow);
+            attemptCounter = 0;
+        }
+        else {
+            attemptCounter++;
+        }
+    }
 
     private void attemptFight(String previousImagesPath){
         try {
+            System.out.println("Attempting fight");
             this.bot.fight();
         }catch(FindFailed e){
             System.out.println("Fight failed somehow");
@@ -392,6 +500,7 @@ public class MCoC extends Thread{
     }
 
     private void uncommonOperations(){
+        checkForPauseAndResetScreen(false);
         Utils.setImagesPath(this.local, "/control");
         //Reconnect menu TODO: make it sleep for at least some minutes before reconnecting
         Match m = Utils.find(this.middleColumn, "reconnect");
@@ -419,11 +528,16 @@ public class MCoC extends Thread{
 
     private void rareOperations(){
 //        Utils.setImagesPath(this.local,"/click");
+        System.out.println("Running Rare operations!");
         Utils.clickIfAvailable(this.r, "later");
+        Utils.clickIfAvailable(this.r, "mcocIcon");
+        Utils.clickIfAvailable(this.r, "genyVMContinue");
     }
 
     //TODO: when adding files, button doesnt change to green!
     private void commonOperations(){
+        System.out.println("Running common operations");
+        checkForPauseAndResetScreen(false);
         Utils.setImagesPath(this.local, "/control");
         //Check for Arenas, enter one:
         Match match = Utils.find(this.topMiddle, "multiverseArenas");
@@ -481,8 +595,8 @@ public class MCoC extends Thread{
     //TODO: this is currently optimized for the Macbook screen...
     public void controller(){
         Utils.setImagesPath(this.local, "/control");
-        uncommonOperations();
         rareOperations();
+        uncommonOperations();
 
         this.attemptFight("/control");
         commonOperations();
@@ -520,8 +634,40 @@ public class MCoC extends Thread{
         try {
 
             PropertiesManager pm = new PropertiesManager();
-            Utils.highlightRegion(this.leftSide);
-            Utils.highlightRegion(this.rightSide);
+            App app = new App(this.getStringProperty("app"));//"player");
+            int chosenWindow = 0;
+            int windowArea = 0;
+            System.out.println("Testing windows....");
+            for(int i=0;i<10;i++){
+                Region r = app.window(i);
+                if(r!=null) {
+                    int newArea = app.window(i).getH()*app.window(i).getW();
+//                    System.out.println("Window "+i+" is available, with an area of: "+newArea);
+                    if(newArea>windowArea){
+                        chosenWindow = i;
+                        windowArea = newArea;
+                    }
+                }
+            }
+            app.focus(chosenWindow);
+            X1 = app.window(chosenWindow).getX();
+            Y1 = app.window(chosenWindow).getY();
+            X2 = app.window(chosenWindow).getW() + X1;
+            Y2 = app.window(chosenWindow).getH() + Y1;
+            new Screen().setRect(X1, Y1, X2 - X1, Y2 - Y1).highlight();
+//            app.focus(appWindow);//2);
+//            if(app.window(appWindow).getW()<app.window(appWindow).getH()) {
+//                System.out.println("detect wrong screen position!, waiting a little bit more...");
+//                throw new Exception();
+//            }
+//            X1 = app.window(appWindow).getX();
+//            Y1 = app.window(appWindow).getY();
+//            X2 = app.window(appWindow).getW() + X1;
+//            Y2 = app.window(appWindow).getH() + Y1;
+//            this.s = new Screen();
+//            return s.setRect(X1, Y1, X2 - X1, Y2 - Y1);
+//            Utils.highlightRegion(this.leftSide);
+//            Utils.highlightRegion(this.rightSide);
 //            Utils.setImagesPath("/fight");
 //            Utils.setImagesPath(this.local,"/control");
 //            Match m = Utils.find(this.r, "rewards");

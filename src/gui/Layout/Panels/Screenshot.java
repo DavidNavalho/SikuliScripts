@@ -1,6 +1,7 @@
 package gui.Layout.Panels;
 
 import gui.MCoCFrame;
+import logic.Utils;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -26,8 +27,9 @@ public class Screenshot extends JPanel implements ActionListener{
     private JButton validity;
     private JFileChooser fc;
     private JLabel ownLabel;
+    private JButton test;
 
-    public Screenshot(MCoCFrame father, String description, String exampleLocation, String screenshotLocation){
+    public Screenshot(final MCoCFrame father, String description, String exampleLocation, String screenshotLocation){
         super();
         this.father = father;
         this.ssLocation = screenshotLocation;
@@ -64,6 +66,16 @@ public class Screenshot extends JPanel implements ActionListener{
 
         this.validity = new JButton("-X-");
         this.validity.setEnabled(false);
+
+        //TODO: handle detection of the images, to see if it's identifying it correctly... (MVC would have been great for this....)
+//        this.test = new JButton("Test");
+//        this.test.setEnabled(true);
+//        this.test.addActionListener(new ActionListener() {
+//
+//            public void actionPerformed(ActionEvent e) {
+////                Utils.highlightRegion();
+//            }
+//        });
 
         JButton getSSButton = new JButton("Add screenshot...");
         getSSButton.addActionListener(this);
@@ -128,7 +140,6 @@ public class Screenshot extends JPanel implements ActionListener{
 
     public void actionPerformed(ActionEvent e){
         int returnVal = fc.showOpenDialog(this);
-
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             File file = fc.getSelectedFile();
             if(file.isFile()) {
@@ -138,6 +149,7 @@ public class Screenshot extends JPanel implements ActionListener{
                         System.out.println("Writing to file");
                         Path source = file.toPath();
                         Path target = new File(this.ssLocation).toPath();
+                        Files.createDirectories(target.getParent());
                         Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
                         this.screenshotExists();
                         this.updateUserIcon();

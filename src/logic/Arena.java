@@ -41,16 +41,19 @@ public class Arena {
         this.milestoneLastChecked = 0;
         this.arenaType = arenaType;
         int X1, Y1, width, height;
-        App app = new App(Utils.getStringProperty(this.props, "app"));//"player");
-        int appWindow = Utils.getIntProperty(this.props, "appWindow");
-        app.focus(appWindow);//2);
-        X1 = app.window(appWindow).getX();
-        Y1 = app.window(appWindow).getY();
+//        App app = new App(Utils.getStringProperty(this.props, "app"));//"player");
+//        int appWindow = Utils.getIntProperty(this.props, "appWindow");
+//        app.focus(appWindow);//2);
+        X1 = this.screen.getX(); //app.window(appWindow).getX();
+        Y1 = this.screen.getY();
         width = this.screen.getW();
         height = this.screen.getH();
         this.leftSide = new Region(X1, Y1, width/2, height);
         this.rightSide = new Region(X1+width/2, Y1, width/2, height);
     }
+
+    //3-star: 222070
+    //4-star: 660395
 
     protected void setInactive(){
         this.active = false;

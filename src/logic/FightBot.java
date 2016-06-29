@@ -1,5 +1,6 @@
 package logic;
 
+import main.MCoC;
 import org.sikuli.basics.Settings;
 import org.sikuli.script.Button;
 import org.sikuli.script.FindFailed;
@@ -26,7 +27,9 @@ public class FightBot {
 
     Properties prop = null;
 
-    public FightBot(Region r, Region attackRegion, Region tinyUpTop, double defaultSimilarity, String localExtraPath, Properties prop){
+    protected MCoC controller;
+
+    public FightBot(Region r, Region attackRegion, Region tinyUpTop, double defaultSimilarity, String localExtraPath, Properties prop, MCoC controller){
         this.r = r;
         this.attackRegion = attackRegion;
         this.defenseRegion = new Region((this.r.getX()-this.r.getW()+this.attackRegion.getX()), this.attackRegion.getY(), this.attackRegion.getW(), this.attackRegion.getH());
@@ -39,6 +42,7 @@ public class FightBot {
         this.localExtraPath = localExtraPath;
         this.prop = prop;
         this.timedActions = new TimedAction(new Integer(this.prop.getProperty("timeBetweenActions")));
+        this.controller = controller;
     }
 
     private void setEnergyLocation(){
@@ -118,6 +122,7 @@ public class FightBot {
 //        this.r.wait("fightPause", 3);
 //        System.out.println("Looking for a fight...");
         while(true){
+            this.controller.checkForPauseAndResetScreen(false);
             if(Utils.find(this.pauseRegion, "pause")!=null) {
                 this.swipeForward();
                 this.attack();

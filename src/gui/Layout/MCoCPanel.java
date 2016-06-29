@@ -19,8 +19,8 @@ public class MCoCPanel extends JPanel {
         super();
         this.father = father;
         this.setLayout(new FlowLayout());
-        this.playPanel = new PlayPanel();
-        Label label = new Label("Ctrl + S to STOP");
+        this.playPanel = new PlayPanel(father);
+        Label label = new Label("Ctrl + S to PAUSE/STOP");
 //        JPanel panel = new JPanel();
 //        panel.add(label)
         this.add(label);
