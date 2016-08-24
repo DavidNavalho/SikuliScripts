@@ -112,14 +112,14 @@ public class RebootHandler extends Thread{
     public void run() {
         System.out.println("Reboot timer started...tick tock tick tock");
         Integer timerInMinutes = new Integer(this.props.getProperty("rebootTimer"));
-        while(true){
-            Utils.sleep(timerInMinutes*60);//it's in seconds, so multiply the minutes by 60...
-            bot.pauseEnabled = true;
-            System.out.println("I Woke up! Time for a Big Bang!\r\n(╯°□°）╯︵ ┻━┻ ");
-            this.handleReboot();
-            bot.setScreen(true);
-            bot.pauseEnabled = false;
-        }
+//        while(true){
+//            Utils.sleep(timerInMinutes*60);//it's in seconds, so multiply the minutes by 60...
+//            bot.pauseEnabled = true;
+//            System.out.println("I Woke up! Time for a Big Bang!\r\n(╯°□°）╯︵ ┻━┻ ");
+//            this.handleReboot();
+//            bot.setScreen(true);
+//            bot.pauseEnabled = false;
+//        }
 
     }
 

@@ -32,10 +32,13 @@ public class FightBot {
     public FightBot(Region r, Region attackRegion, Region tinyUpTop, double defaultSimilarity, String localExtraPath, Properties prop, MCoC controller){
         this.r = r;
         this.attackRegion = attackRegion;
-        this.defenseRegion = new Region((this.r.getX()-this.r.getW()+this.attackRegion.getX()), this.attackRegion.getY(), this.attackRegion.getW(), this.attackRegion.getH());
-        this.defenseRegionBack = new Region(this.defenseRegion.getX()-this.defenseRegion.getW(),this.defenseRegion.getY(),this.defenseRegion.getW(),this.defenseRegion.getH());
-        this.attackRegionBack = new Region(this.attackRegion.getX()-this.attackRegion.getW(),this.attackRegion.getY(),this.attackRegion.getW(),this.attackRegion.getH());
-        this.attackRegionForward = new Region(this.attackRegion.getX()+this.attackRegion.getW(),this.attackRegion.getY(),this.attackRegion.getW(),this.attackRegion.getH());
+//        this.defenseRegion = new Region((this.r.getX()-this.r.getW()+this.attackRegion.getX()), this.attackRegion.getY(), this.attackRegion.getW(), this.attackRegion.getH());
+//        this.defenseRegionBack = new Region(this.defenseRegion.getX()-this.defenseRegion.getW()*3,this.defenseRegion.getY(),this.defenseRegion.getW(),this.defenseRegion.getH());
+//        Utils.highlightRegion(defenseRegion);
+//        System.out.println("SABHDYBHUDSBJBD");
+//        Utils.highlightRegion(defenseRegionBack);
+        this.attackRegionBack = new Region(this.attackRegion.getX()-this.attackRegion.getW()*2,this.attackRegion.getY(),this.attackRegion.getW(),this.attackRegion.getH());
+        this.attackRegionForward = new Region(this.attackRegion.getX()+this.attackRegion.getW()*3,this.attackRegion.getY(),this.attackRegion.getW(),this.attackRegion.getH());
         this.setEnergyLocation();
         this.pauseRegion = tinyUpTop;
         this.similarity = defaultSimilarity;
@@ -66,6 +69,7 @@ public class FightBot {
 //            this.r.dragDrop(this.attackRegion, this.attackRegionForward);
             this.r.hover(this.attackRegion);
             this.r.mouseDown(Button.LEFT);
+//            this.timedActions.waitForAction(50);
             this.r.hover(this.attackRegionForward);
             this.timedActions.waitForAction(100);
             this.r.mouseUp();
@@ -80,9 +84,9 @@ public class FightBot {
 //            System.out.println("backward");
             this.timedActions.waitForAction();
 //            this.r.dragDrop(this.attackRegion, this.attackRegionBack);
-            this.r.hover(this.defenseRegion);
+            this.r.hover(this.attackRegionForward);
             this.r.mouseDown(Button.LEFT);
-            this.r.hover(this.defenseRegionBack);
+            this.r.hover(this.attackRegion);
             this.timedActions.waitForAction(100);
             this.r.mouseUp();
         }catch(Exception e){
@@ -92,6 +96,7 @@ public class FightBot {
 
     private void attack(){
         try {
+            Settings.MoveMouseDelay = new Float(this.prop.getProperty("mouseSpeedFight"));
 //            System.out.println("attack");
             this.timedActions.waitForAction();
             Utils.click(this.attackRegion);
@@ -104,9 +109,9 @@ public class FightBot {
         try {
 //            System.out.println("defend");
             this.timedActions.waitForAction();
-            this.r.hover(this.defenseRegion);
+//            this.r.hover(this.defenseRegion);
             this.r.mouseDown(Button.LEFT);
-            this.timedActions.waitForAction(100);
+            this.timedActions.waitForAction();
             this.r.mouseUp();
         }catch(Exception e){
             System.out.println("Failed to attack");
@@ -124,11 +129,15 @@ public class FightBot {
         while(true){
             this.controller.checkForPauseAndResetScreen(false);
             if(Utils.find(this.pauseRegion, "pause")!=null) {
+                this.timedActions.waitForAction();
                 this.swipeForward();
                 this.attack();
                 this.attack();
                 this.attack();
-                this.swipeForward();
+                this.attack();
+                this.attack();
+
+//                this.swipeForward();
                 //swipe forward
 //                this.r.dragDrop(this.r.getCenter(),this.attackRegion);
                 //attack and...
@@ -145,6 +154,7 @@ public class FightBot {
                         if(Utils.findWithSimilarity(this.specialBar, "specialRed", 0.75, this.similarity) != null)
                             specialActive = true;
                 }
+                this.timedActions.waitForAction();
                 this.swipeBackward();
 //                this.defend();
                 //and then swipe back swipes are too slow....

@@ -578,6 +578,10 @@ public class MCoC extends Thread{
             Region dragRegion = this.regenRegion;
 
             while (Utils.find(this.thirdBoxRegion, "thirdAvailableSpot") != null) {
+                if(Utils.find(this.r, "getMore")!=null) {
+                    Utils.clickIfAvailable(this.r, "backButton");
+                    return;
+                }
                 if(!takeCareofRegens())
                     return;
                 //TODO: 'fallback' if the first one has that clock icon - means this roster is full, and we should go back and do another arena

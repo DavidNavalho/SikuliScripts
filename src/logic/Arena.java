@@ -135,35 +135,35 @@ public class Arena {
             Match movable = Utils.find(this.screen, thingToMove);
             try {
                 this.screen.mouseUp();
-                Utils.sleepMilis(50);
+                Utils.sleepMilis(150);
                 this.screen.hover(new Location(movable.getTopRight().getX() - (movable.getW() / 10), movable.getY()));
                 this.screen.mouseDown(Button.LEFT);
-                Utils.sleepMilis(50);
+                Utils.sleepMilis(250);
                 this.screen.hover(new Location(movable.getTopRight().getX() - (this.screen.getW() / 80) * 3, movable.getY()));
-                Utils.sleepMilis(50);
+                Utils.sleepMilis(150);
                 this.screen.hover(new Location(movable.getTopRight().getX() - (this.screen.getW() / 80) * 4, movable.getY()));
-                Utils.sleepMilis(50);
+                Utils.sleepMilis(150);
                 this.screen.hover(new Location(movable.getTopRight().getX() - (this.screen.getW() / 80) * 5, movable.getY()));
-                Utils.sleepMilis(50);
+                Utils.sleepMilis(150);
                 this.screen.hover(new Location(movable.getTopRight().getX() - (this.screen.getW() / 80) * 6, movable.getY()));
-                Utils.sleepMilis(50);
+                Utils.sleepMilis(150);
                 this.screen.hover(new Location(movable.getTopRight().getX() - (this.screen.getW() / 80) * 7, movable.getY()));
-                Utils.sleepMilis(50);
+                Utils.sleepMilis(150);
                 this.screen.mouseUp();
-                Utils.sleepMilis(100);
+                Utils.sleepMilis(250);
             } catch (FindFailed ff) {
                 System.out.println("FindFailed");
                 this.screen.mouseUp();
-                Utils.sleepMilis(100);
+                Utils.sleepMilis(250);
                 return false;
             } catch (NullPointerException np) {
 //                System.out.println("NullPointer: ");
                 this.screen.mouseUp();
-                Utils.sleepMilis(100);
+                Utils.sleepMilis(250);
                 return false;
             }
             this.screen.mouseUp();
-            Utils.sleepMilis(100);
+            Utils.sleepMilis(250);
         }
         return true;
     }
